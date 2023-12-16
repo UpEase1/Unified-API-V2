@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Request, Query, status
 from fastapi.responses import JSONResponse
-from graph_files.students import Students
-from graph_files.courses import Courses
-from graph_files.institute import Institute
+
+from ..graph_files.students import Students
+from ..graph_files.courses import Courses
+from ..graph_files.institute import Institute
+
 from configparser import ConfigParser
 
 router = APIRouter()

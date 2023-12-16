@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Request, Query, status
 from fastapi.responses import JSONResponse
-from graph_files.students import Students
-from graph_files.courses import Courses
-import configparser
+
+from ..graph_files.students import Students
+from ..graph_files.courses import Courses
+from ..graph_files.institute import Institute
+
+from configparser import ConfigParser
 
 router = APIRouter()
-config = configparser.ConfigParser()
+config = ConfigParser()
 config.read(['config.cfg', 'config.dev.cfg'])
 azure_settings = config['azure']
 students_instance = Students(azure_settings)

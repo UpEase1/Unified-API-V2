@@ -39,6 +39,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+# ! Still have to figure out config for routers
 # Setup
 config = configparser.ConfigParser()
 config.read(['config.cfg', 'config.dev.cfg'])
@@ -60,8 +61,9 @@ def get_token_from_header(request: Request):
     token = auth_header.split("Bearer ")[-1]
     return token
 
+
 # Verify the token
-def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(security),required_scopes: List[str] = []):
+def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(security), required_scopes: List[str] = []):
     token = authorization.credentials
     credentials_exception = HTTPException(
         status_code=401,
