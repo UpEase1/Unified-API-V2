@@ -16,7 +16,7 @@ from api.v1.routes.institute import router as InstituteRouter
 from api.v1.routes.students import router as StudentsRouter
 
 app = FastAPI()
-
+security = HTTPBearer()
 
 # CORS
 origins = [
