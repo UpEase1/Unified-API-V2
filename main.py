@@ -1,30 +1,29 @@
 import json
 import configparser
 import pandas as pd
+from msgraph.generated.models.o_data_errors.o_data_error import ODataError
+from typing import List, Optional
+from jose import JWTError, jwt
+import logging
+
 from fastapi import FastAPI, Body, Depends, HTTPException, Request, Query, Security
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from graph_files.institute import Institute
-from graph_files.students import Students
-from graph_files.courses import Courses
-from pydantic import create_model, BaseModel,ValidationError
-import asyncio
-from msgraph.generated.models.o_data_errors.o_data_error import ODataError
-from typing import List, Optional
-import logging
 from fastapi.middleware.cors import CORSMiddleware
-from jose import JWTError, jwt
+
+from api.v1.routes.courses import router as CoursesRouter
+from api.v1.routes.institute import router as InstituteRouter
+from api.v1.routes.students import router as StudentsRouter
+
 app = FastAPI()
 
-#! CORS Setup for local testing
-# Configure CORS to allow requests from your frontend domain(s)
-# refer: https://ionicframework.com/docs/troubleshooting/cors
+
+# CORS
 origins = [
-    "http://localhost:8100",  # Your local development frontend
-    "https://student.upease.biz",  # Your production frontend
+    "http://localhost:8100",
+    "https://student.upease.biz",
     "https://console.upease.biz",
 ]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -32,24 +31,26 @@ app.add_middleware(
     allow_methods=["GET","POST","DELETE","PUT"],  # You can specify specific HTTP methods if needed
     allow_headers=["Authorization", "Content-Type"],  # You can specify specific headers if needed
 )
+
+
+# Debugger
 course_model = None
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Configuration setup
+
+# Setup
 config = configparser.ConfigParser()
 config.read(['config.cfg', 'config.dev.cfg'])
 azure_settings = config['azure']
-students_instance = Students(azure_settings)
-institute_instance = Institute(azure_settings)
-courses_instance = Courses(azure_settings)
 CLIENT_ID = azure_settings['clientId']
 CLIENT_SECRET = azure_settings['clientSecret']
-security = HTTPBearer()
 
 
-
-
+# Routers
+app.include_router(StudentsRouter, tags=["Students"], prefix="/api/v1/students")
+app.include_router(CoursesRouter, tags=["Courses"], prefix="/api/v1/courses")
+app.include_router(InstituteRouter, tags=["Institute"], prefix="/api/v1/institute")
 
 def get_token_from_header(request: Request):
     auth_header = request.headers.get("Authorization")

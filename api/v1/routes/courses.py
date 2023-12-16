@@ -13,35 +13,36 @@ courses_instance = Courses(azure_settings)
 
 
 # Get Info
-@router.get("/courses/")
+@router.get("/")
 async def get_all_courses():
     courses = await courses_instance.get_all_courses()
     return courses
 
-@router.get("/courses/{course_id}/")
+@router.get("/{course_id}/")
 async def get_course_by_id(course_id:str):
     course = await courses_instance.get_course_by_id(course_id=course_id)
     return course
 
-@router.get("/courses/{course_id}/students/")
+@router.get("/{course_id}/students/")
 async def get_students_of_course(course_id:str):
     student_ids = await courses_instance.get_students_of_course(course_id = course_id)
     return student_ids
 
 # Update Info
-@router.put("/courses/update/{course_id}/")
+@router.put("/update/{course_id}")
 async def update_course_by_id(course_id:str,property_name:str, property_value:str):
     await courses_instance.update_course_by_id( course_id=course_id,property_name=property_name,property_value=property_value)
     return JSONResponse({"updated": "ok"}, status.HTTP_200_OK)
 
-@router.post("/courses/update")
+# Create Course
+@router.post("/create")
 async def create_course(course_details:dict):
     course_id = await courses_instance.create_course(course_details)
     return course_id
 
 # Students
 # ! Return 201 when an entity is added/created
-@router.post("/courses/{course_id}/students/add") 
+@router.post("/{course_id}/students/add") 
 async def add_students_to_course(course_id:str, request:Request, student_ids:str = Query(None, description="Enter comma seperated student ids")): 
     if student_ids:
         student_ids = student_ids.split(',')
@@ -49,7 +50,7 @@ async def add_students_to_course(course_id:str, request:Request, student_ids:str
     result = await courses_instance.add_students_to_course(student_ids=student_ids,course_id=course_id,students=students_instance)
     return JSONResponse({"created": "ok"}, status.HTTP_201_CREATED)
 
-@router.delete("/courses/{course_id}/students/remove")
+@router.delete("/{course_id}/students/remove")
 async def remove_students_from_course_api(student_ids:list, course_id:str):
     for student_id in student_ids:
         await courses_instance.remove_student_from_course(course_id=course_id,student_id=student_id)
@@ -58,13 +59,13 @@ async def remove_students_from_course_api(student_ids:list, course_id:str):
 # Delete
 # ? This seems redundant, as you can 
 # ? remove one course with the same endpoint as the bulk remove
-@router.delete("/courses/delete/{course_id}")
+@router.delete("/delete/{course_id}")
 async def retire_course_api(course_id:str):
     await courses_instance.retire_course_by_id(course_id=course_id)
     return JSONResponse({"deleted": "ok"}, status.HTTP_200_OK)
 
 # ? How does course_ids: list translate to the url?
-@router.delete("/courses/delete")
+@router.delete("/delete")
 async def retire_course_bulk(course_ids: list):
     for course_id in course_ids:
         await courses_instance.retire_course_by_id(course_id=course_id)

@@ -15,30 +15,30 @@ institute_instance = Institute(azure_settings)
 
 # Student Props
 # ? What are properties
-@router.get("/institute/students/properties/")
+@router.get("/students/properties/")
 async def get_student_properties():
     result = await institute_instance.fetch_extensions_student()
 
-@router.post("/institute/students/properties/create")
+@router.post("/students/properties/create")
 async def create_student_properties(student_properties: list[dict]):
     result = await institute_instance.student_properties_builder_flow(student_properties)
 
-@router.delete("/institute/students/properties/delete")
+@router.delete("/students/properties/delete")
 async def delete_student_properties(student_property_ids: list[str]):
     await institute_instance.delete_student_properties(properties=student_property_ids)
 
 
 # Course Props
-@router.get("/institute/courses/properties/")
+@router.get("/courses/properties/")
 async def get_course_properties():
     result = await institute_instance.fetch_extensions_course()
     return result
 
-@router.post("/institute/courses/properties/create")
+@router.post("/courses/properties/create")
 async def create_course_properties(course_properties: list[dict]):
     result = await institute_instance.course_properties_builder_flow(course_properties)
 
-@router.delete("/institute/courses/properties/delete")
+@router.delete("/courses/properties/delete")
 async def delete_course_properties(course_property_ids: list[str]):
     await institute_instance.delete_course_properties( properties=course_property_ids)
 
