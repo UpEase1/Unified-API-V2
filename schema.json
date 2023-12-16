@@ -1,0 +1,106 @@
+// sample schema for students_data (Each member in the array is a student. Only one student shown for brevity)
+{
+  "students_data": [{
+    "Name": "kemper",
+    "Registration number": "210904048",
+    "Branch": "Btech- Civil Engg",
+    "DOJ": "18-06-2021",
+    "DOB": "18-06-2003",
+    "Gender": "Male",
+    "Mobile Number": "9741354672",
+    "Email ID": "karthik@gmail.com",
+    "Blood Group": "A+",
+    "Admission category": "General",
+    "Nationality": "Indian",
+    "Religion": "Hindu",
+    "Social Category": "Brahmin",
+    "Marital Status": "Single",
+    "Domicile State": "Karnataka",
+    "Aadhar Card Number": "80334567383",
+    "Batch": "2021",
+    "Parent Bank Acc Number": "3.48E+11",
+    "Parent Account Holder Name": "Nara",
+    "Parent IFSC Code": "238000000000000.0",
+    "Parent Branch": "canara",
+    "Parent Bank Name": "canara",
+    "Parent PAN Card Number": "38484838342",
+    "Qualifying Board": "state",
+    "College Last Studied": "TLC PU",
+    "Qualifying Exam": "JEE",
+    "Entrance Test Rank": "230",
+    "tenth marks": "650",
+    "twelfth marks": "650",
+    "Permanent Address": "Vilasnagar New Delhi",
+    "Place": "New Delhi",
+    "State": "Karnataka",
+    "Country": "India",
+    "Pin Code": "575003",
+    "Pass Port Number": "34837998439",
+    "Father Name": "Nara Nayak",
+    "Father Occupation": "Civil Engineer",
+    "Father Contact Number": "975467382",
+    "Father Email ID": "nara.nayak@gmail.com",
+    "Mother Name": "vilasbai",
+    "Mother Occupation": "homemaker",
+    "Mother Contact Number": "874738310",
+    "Mother Email ID": "vilasbai@gmail.com",
+    "Guardian Name": "vilasbai",
+    "Guardian Occupation": "homemaker",
+    "Guardian Contact Number": "874738310",
+    "Guardian Email ID": "vilasbai@gmail.com"
+  }]
+}
+
+// Sample schema for course_data
+// ! Keep all key names in lowercase, using _ to seperate words
+{
+  "course_data": {
+    "name":"Tester-12",
+    "description": "This is a test group which will also be created in cosmosdb",
+    "props": {
+        "program": "Btech",
+        "department": "Civil"
+    }
+  }
+}
+
+// ? There is probably a better way to structure the attendance_dates key.
+{
+  "attendance_data_sample_schema": [{
+      "student_id": "",
+      "student_name": "Bhavik",
+      "attendance_dates": [
+          {
+              "08-10-2023": "P"
+          },
+          {
+              "06-10-2023": "A"
+          },
+          {
+              "05-10-2023": "P"
+          },
+          {
+              "12-10-2023": "A"
+          },
+          {
+              "26-10-2023": "A"
+          },
+          {
+              "16-10-2023": "A"
+          },
+          {
+              "21-10-2023": "A"
+          },
+          {
+              "27-10-2023": "A"
+          },
+          {
+              "20-10-2023": "P"
+          },
+          {
+              "19-10-2023": "P"
+          }
+      ],
+      "assignments": []
+  }]
+}
