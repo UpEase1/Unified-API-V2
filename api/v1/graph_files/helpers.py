@@ -1,9 +1,10 @@
 import random
 import string
 from configparser import SectionProxy
-from azure.identity.aio import ClientSecretCredential
 import pandas as pd
 import re
+
+from azure.identity.aio import ClientSecretCredential
 from kiota_authentication_azure.azure_identity_authentication_provider import (
     AzureIdentityAuthenticationProvider
 )
