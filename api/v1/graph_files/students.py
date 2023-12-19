@@ -1,10 +1,12 @@
 from configparser import SectionProxy
-from azure.identity.aio import ClientSecretCredential
 import pandas as pd
 from typing import List
 from typing import Dict
 import re
-import graph_files
+
+from . import helpers
+
+from azure.identity.aio import ClientSecretCredential
 from kiota_authentication_azure.azure_identity_authentication_provider import (
     AzureIdentityAuthenticationProvider
 )
@@ -90,7 +92,7 @@ class Students:
         # implement validation of JSON to ensure that the template fields are present
         display_name = student_extension_properties['Name']
         mail = ''.join([word.capitalize() for word in display_name.split()]) + "@v2tzs.onmicrosoft.com"
-        password = graph_files.helpers.password_generate_msft()
+        password = helpers.password_generate_msft()
         request_body.display_name = display_name
         request_body.mail_nickname = ''.join([word.capitalize() for word in display_name.split()])
         request_body.user_principal_name = mail
@@ -164,7 +166,7 @@ class Students:
         for value in result.value:
             if value.name[10:42] == re.sub("-", "", application_id):
                 extension_property_names_with_app.append(value.name)
-                extension_property_names.append(graph_files.helpers.convert_key(value.name))
+                extension_property_names.append(helpers.convert_key(value.name))
         query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters(
             select=['displayName', 'id', 'faxNumber'] + [str(value) for value in extension_property_names_with_app],
             # Sort by display name

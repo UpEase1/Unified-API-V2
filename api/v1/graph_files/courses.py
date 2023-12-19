@@ -1,10 +1,12 @@
 import configparser
 from configparser import SectionProxy
-from azure.identity.aio import ClientSecretCredential
 import re
-from graph_files.Institute import Institute
-from graph_files.students import Students
-import graph_files
+
+from .institute import Institute
+from .students import Students
+from . import helpers
+
+from azure.identity.aio import ClientSecretCredential
 from kiota_authentication_azure.azure_identity_authentication_provider import (
     AzureIdentityAuthenticationProvider
 )
@@ -30,7 +32,7 @@ class Courses:
     app_client: GraphServiceClient
     client:CosmosClient
 
-    def __init__(self, config: SectionProxy):
+    def __init__(self, config: SectionProxy): 
         self.settings = config
         client_id = self.settings['clientId']
         tenant_id = self.settings['tenantId']
@@ -75,7 +77,7 @@ class Courses:
         for value in result.value:
             if value.name[10:42] == re.sub("-", "", application_id):
                 extension_property_names_with_app.append(value.name)
-                extension_property_names.append(graph_files.helpers.convert_key(value.name))
+                extension_property_names.append(helpers.convert_key(value.name))
         query_params = GroupsRequestBuilder.GroupsRequestBuilderGetQueryParameters(
             select=['displayName', 'id'] + [str(value) for value in extension_property_names_with_app],
             # Sort by display name
@@ -86,27 +88,26 @@ class Courses:
         )
 
         course = await self.app_client.groups.by_group_id(course_id).get(request_config)
-        member_query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters(
-            select = ['displayName','id'],
+        # member_query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters(
+        #     select = ['displayName','id'],
 
-        )
-        member_request_config = UsersRequestBuilder.UsersRequestBuilderGetRequestConfiguration(query_parameters=member_query_params,headers = {
-		'ConsistencyLevel' : "eventual",
-})
+        # )
+        # member_request_config = UsersRequestBuilder.UsersRequestBuilderGetRequestConfiguration(query_parameters=member_query_params,headers = {
+		# 'ConsistencyLevel' : "eventual",
+        # })
 
-        members = await self.app_client.groups.by_group_id(course_id).members.get(request_configuration=member_request_config)
+        # members = await self.app_client.groups.by_group_id(course_id).members.get(request_configuration=member_request_config)
         #del members["@odata.context"]
         course_data = {}
         course_data["Name"] = course.display_name
         course_data['id'] = course.id
         course_data["properties"] = course.additional_data
-        course_data["members"] = members.value
+        # course_data["members"] = members.value                            # Issue: Member implementation in new library. Issue code commented out.
         return course_data
 
-# When a course is created, the course_details parameter is expected. 
-# This course_details parameter has a dynamic schema which is dependent on the course_extension_properties
-# chosen by the institute.
-
+    # When a course is created, the course_details parameter is expected. 
+    # This course_details parameter has a dynamic schema which is dependent on the course_extension_properties
+    # chosen by the institute.
     async def create_course(self, course_details):
         app_id = self.settings['course_dir_app']
         course_name = course_details['Name']
@@ -168,8 +169,8 @@ class Courses:
     #         add_student_to_course_document(self,course_id=course_id,student_name=student_name,registration_number=registration_number,course_name = course_name)
 
 
-# When a student is added to a course, it adds the student (Represented by the id) to an M365 group instance
-# representing the course. It also adds the student to a cosmos DB item representing the course.
+    # When a student is added to a course, it adds the student (Represented by the id) to an M365 group instance
+    # representing the course. It also adds the student to a cosmos DB item representing the course.
 
     async def add_students_to_course(self,student_ids:list,course_id:str,students:Students):
 
@@ -195,16 +196,16 @@ class Courses:
             await self.app_client.groups.by_group_id(course_id).members.ref.post(request_body)
             add_student_to_course_document(self,course_id=course_id,student_name=student_name,registration_number=registration_number,student_id = student_id)
 
-# When a student is added to a course in Console, the student is added
-# to an M365 group representing that course as well as a CosmosDB item representing the course.
-# However, when a student is removed, in order to preserve attendance data for training purposes,
-# the student will not be removed from the cosmos document. This also ensures that accidental removal can be reversed.
-# If a student is removed from a course in teams, azure portal or Console, the outcome remains same.
-# Since CosmosDB is a natural extension of MSGraph, the student who is removed from a course will not be
-# able to see his attendance for that course, even if his entry is still present in CosmosDB. However, the
-# teacher who updates attendance for that course will still be able to see his enrollment for that course.
-# The teacher may simply ignore that enrollment and not update attendance in the JavaScript Add-in.
-# Removal of a student from the course can be reversed without any high level consequences.
+    # When a student is added to a course in Console, the student is added
+    # to an M365 group representing that course as well as a CosmosDB item representing the course.
+    # However, when a student is removed, in order to preserve attendance data for training purposes,
+    # the student will not be removed from the cosmos document. This also ensures that accidental removal can be reversed.
+    # If a student is removed from a course in teams, azure portal or Console, the outcome remains same.
+    # Since CosmosDB is a natural extension of MSGraph, the student who is removed from a course will not be
+    # able to see his attendance for that course, even if his entry is still present in CosmosDB. However, the
+    # teacher who updates attendance for that course will still be able to see his enrollment for that course.
+    # The teacher may simply ignore that enrollment and not update attendance in the JavaScript Add-in.
+    # Removal of a student from the course can be reversed without any high level consequences.
     async def remove_student_from_course(self, student_id,course_id):
         await self.app_client.groups.by_group_id(course_id).members.by_directory_object_id(student_id).ref.delete()
 
@@ -219,50 +220,48 @@ class Courses:
         result = await self.app_client.groups.by_group_id(course_id).patch(request_body)
         pass
 
-# Retire course will only remove the course from all Microsoft integrations. It will not remove the course from
-#the cosmos DB instance. Once a course is retired, it cannot be reversed as the course_id will change.
-# The course item along with the student enrolment details will still be available in Cosmos for training purposes.
+    # Retire course will only remove the course from all Microsoft integrations. It will not remove the course from
+    #the cosmos DB instance. Once a course is retired, it cannot be reversed as the course_id will change.
+    # The course item along with the student enrolment details will still be available in Cosmos for training purposes.
     async def retire_course_by_id(self,course_id:str):
         await self.app_client.groups.by_group_id(course_id).delete()
 
 
-# Gets students of a course. However, currently it will fetch all members of the M365 group representing the course.
-# To filter for students, we can implement EDU model and run a filter against the ids returned. However, currently
-# We dont have access to the EDU model.
+    # Gets students of a course. However, currently it will fetch all members of the M365 group representing the course.
+    # To filter for students, we can implement EDU model and run a filter against the ids returned. However, currently
+    # We dont have access to the EDU model.
     async def get_students_of_course(self,course_id:str):     #Issue
         student_info = []
         result = await self.app_client.groups.by_group_id(course_id).members.get()
         for value in result.value:
-            student_data = { "id": value._id, "name": value._display_name, "mail": value._mail}
+            student_data = { "id": value.id, "name": value.display_name, "mail": value.mail}
             student_info.append(student_data)
         return student_info
-# student_attendance_list_schema = [{
-#  "Registration Number": int, attendance_list: [
-# 02-10-2023: "P"]}]
-    async def add_attendance_to_course_student(self,course_id:str, student_id:str, attendance_list:list):
+    
+    # student_attendance_list_schema = [{
+    #  "Registration Number": int, attendance_list: [
+    # 02-10-2023: "P"]}]
+    async def add_attendance_to_course_students(self,course_id:str,new_attendance_data):
         data = self.container.read_item(item=course_id, partition_key=course_id)
+    # Iterate through each student in the item's student list
+        for student in new_attendance_data:
+            # Find the matching student in the course item
+            course_student = next((s for s in data['students'] if s['student_id'] == student['id']), None)
+            if course_student:
+                # Add new attendance dates without duplicating
+                existing_dates = set()
+                for attendance in course_student['attendance_dates']:
+                    for date in attendance:
+                        print(date)
+                        existing_dates.add(str(date))  # Add only the date key, which is a string
 
-    # Find the student with the given registration number
-        for student in data['students']:
-            if student['student_id'] == student_id:
-                
-                # Initialize attendance_dates if it doesn't exist
-                if 'attendance_dates' not in student:
-                    student['attendance_dates'] = []
-                
-                # Check for duplicate attendance date
-                for attendance in student['attendance_dates']:
-                    if list(attendance_list.keys())[0] in attendance:
-                        return
-                
-                # Update attendance
-                student['attendance_dates'].append(attendance_list)
-                break
-        else:
-            return
-
-        # Upsert the item
-        self.container.upsert_item(body=data)
+                for new_attendance in student['attendance_dates']:
+                    for date, status in new_attendance.items():
+                        print(date)
+                        if date not in existing_dates:
+                            course_student['attendance_dates'].append({date: status})
+                            existing_dates.add(str(date))
+        self.container.replace_item(course_id, data)
     
     async def add_faculty_to_course(self,course_id,faculty_id):
         pass
