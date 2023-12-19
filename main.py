@@ -95,39 +95,6 @@ async def odata_error_handler(request: Request, exc: ODataError):
         },
     )
 
-
-# It is mandatory to provide all the property values. However, in reality only some mandatory properties are required.
-# Currently, for the trial tenant, they are Name and Registration number.
-# If you want to test the creation of student and dont have the property value (Or if the property key is frivolous),
-# Call the property value "Placeholder" and submit.
-
-
-# async def create_enum_extension(institute:Institute,institute_name:str,institute_id:str):
-#     await institute.create_enum_extension(institute_name=institute_name,institute_id=institute_id)
-
-# async def create_institute_document(institute:Institute, institute_name:str):
-#     await institute.create_institution_extension_document(institute_name=institute_name)
-
-
-# Synchronous functions
-# </MakeGraphCallSnippet>
-def csv_to_json(filepath):
-    # Reading the CSV file using pandas
-    df = pd.read_csv(filepath)
-    df = df.applymap(str)
-    # Converting all values to string
-
-    # Returning the JSON representation of the dataframe
-    return df.to_dict(orient='records')
-
-def csv_header_to_json(csv_filename):
-    df = pd.read_csv(csv_filename)
-    header_list = df.columns.tolist()
-    header_json = json.dumps(header_list)
-    return header_json
-    pass
-
-
 # # modifying the openapi schema to reflect our dynamic models
 # original_openapi = app.openapi
 # def custom_openapi_course():

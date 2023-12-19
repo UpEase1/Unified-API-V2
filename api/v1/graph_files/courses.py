@@ -32,7 +32,7 @@ class Courses:
     app_client: GraphServiceClient
     client:CosmosClient
 
-    def __init__(self, config: SectionProxy):
+    def __init__(self, config: SectionProxy): 
         self.settings = config
         client_id = self.settings['clientId']
         tenant_id = self.settings['tenantId']
@@ -88,21 +88,21 @@ class Courses:
         )
 
         course = await self.app_client.groups.by_group_id(course_id).get(request_config)
-        member_query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters(
-            select = ['displayName','id'],
+        # member_query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters(
+        #     select = ['displayName','id'],
 
-        )
-        member_request_config = UsersRequestBuilder.UsersRequestBuilderGetRequestConfiguration(query_parameters=member_query_params,headers = {
-		'ConsistencyLevel' : "eventual",
-})
+        # )
+        # member_request_config = UsersRequestBuilder.UsersRequestBuilderGetRequestConfiguration(query_parameters=member_query_params,headers = {
+		# 'ConsistencyLevel' : "eventual",
+        # })
 
-        members = await self.app_client.groups.by_group_id(course_id).members.get(request_configuration=member_request_config)
+        # members = await self.app_client.groups.by_group_id(course_id).members.get(request_configuration=member_request_config)
         #del members["@odata.context"]
         course_data = {}
         course_data["Name"] = course.display_name
         course_data['id'] = course.id
         course_data["properties"] = course.additional_data
-        course_data["members"] = members.value
+        # course_data["members"] = members.value                            # Issue: Member implementation in new library. Issue code commented out.
         return course_data
 
     # When a course is created, the course_details parameter is expected. 
@@ -241,30 +241,27 @@ class Courses:
     # student_attendance_list_schema = [{
     #  "Registration Number": int, attendance_list: [
     # 02-10-2023: "P"]}]
-    async def add_attendance_to_course_student(self,course_id:str, student_id:str, attendance_list:list):
+    async def add_attendance_to_course_students(self,course_id:str,new_attendance_data):
         data = self.container.read_item(item=course_id, partition_key=course_id)
+    # Iterate through each student in the item's student list
+        for student in new_attendance_data:
+            # Find the matching student in the course item
+            course_student = next((s for s in data['students'] if s['student_id'] == student['id']), None)
+            if course_student:
+                # Add new attendance dates without duplicating
+                existing_dates = set()
+                for attendance in course_student['attendance_dates']:
+                    for date in attendance:
+                        print(date)
+                        existing_dates.add(str(date))  # Add only the date key, which is a string
 
-    # Find the student with the given registration number
-        for student in data['students']:
-            if student['student_id'] == student_id:
-                
-                # Initialize attendance_dates if it doesn't exist
-                if 'attendance_dates' not in student:
-                    student['attendance_dates'] = []
-                
-                # Check for duplicate attendance date
-                for attendance in student['attendance_dates']:
-                    if list(attendance_list.keys())[0] in attendance:
-                        return
-                
-                # Update attendance
-                student['attendance_dates'].append(attendance_list)
-                break
-        else:
-            return
-
-        # Upsert the item
-        self.container.upsert_item(body=data)
+                for new_attendance in student['attendance_dates']:
+                    for date, status in new_attendance.items():
+                        print(date)
+                        if date not in existing_dates:
+                            course_student['attendance_dates'].append({date: status})
+                            existing_dates.add(str(date))
+        self.container.replace_item(course_id, data)
     
     async def add_faculty_to_course(self,course_id,faculty_id):
         pass
