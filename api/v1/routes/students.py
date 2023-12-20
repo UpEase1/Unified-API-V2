@@ -73,7 +73,7 @@ async def get_student_by_id(student_id: str):
 @router.get("/{student_id}/courses")
 async def get_courses_of_student(student_id:str):
     course_ids = await students_instance.get_courses_of_student(student_id=student_id)
-    return cou --rse_ids
+    return course_ids
 
 @router.get("/{student_id}/attendance")
 async def get_attendance(student_id: str, request:Request, course_ids: str = Query(None, description="Enter comma seperated course ids"),current_user:dict =Depends(get_current_user)):

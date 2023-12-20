@@ -271,7 +271,7 @@ class Courses:
 
         # Original query without filtering for specific student
         query = """
-        SELECT c.id, c.students 
+        SELECT c.id, c.students ,c.Name
         FROM c 
         WHERE ARRAY_CONTAINS(@course_ids, c.id)
         """
@@ -289,7 +289,7 @@ class Courses:
             student_data = next((student for student in course_item['students'] if student['student_id'] == student_id), None)
             
             if student_data:
-                course_data = {"course_id": course_item['id']}
+                course_data = {"course_id": course_item['id'],"course_name":course_item['Name']}
 
                 # Improved handling of attendance data
                 if 'attendance_dates' in student_data:
