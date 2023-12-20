@@ -12,7 +12,7 @@ endif
 INSTALL_REQS := pip install -r requirements.txt
 
 # Define the command to run the server
-RUN_SERVER := uvicorn ams_api:app --reload
+RUN_SERVER := uvicorn main:app --reload
 
 .PHONY: venv install run
 
