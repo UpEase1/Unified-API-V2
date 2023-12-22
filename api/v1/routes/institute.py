@@ -1,15 +1,18 @@
 from fastapi import APIRouter, Request, Query, status, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
+from jwcrypto import jwk
+import os
 
 from ..graph_files.students import Students
 from ..graph_files.courses import Courses
 from ..graph_files.institute import Institute
+from public_key_gen import initialize_jwks_cache
 
 from configparser import ConfigParser
 from jose import JWTError, jwt
 from typing import List
+import json
 
 router = APIRouter()
 config = ConfigParser()
@@ -30,9 +33,16 @@ def get_token_from_header(request: Request):
     token = auth_header.split("Bearer ")[-1]
     return token
 
+# Get the unverified header and the kid from the token
+
+def get_unverified_header(token):
+    unverified_header = jwt.get_unverified_header(token)
+    return unverified_header.get('kid')
+
 
 # Verify the token
-def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(security), required_scopes: List[str] = []):
+def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(security)):
+    required_scopes = "UpeaseUnified.ReadWrite.All"
     token = authorization.credentials
     credentials_exception = HTTPException(
         status_code=401,
@@ -40,22 +50,47 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        # Decode the token
-        public_key_path = 'public_key.pem'
-        with open(public_key_path, 'r') as key_file:
-            public_key = key_file.read()
-        payload = jwt.decode(token, public_key, algorithms=["RS256"], audience=CLIENT_ID)
-        if payload.get("aud") != CLIENT_ID and payload.get("scp") != required_scopes:
-            raise credentials_exception
-        return payload
-    except JWTError:
+        # Verify the signature
+        public_key_path = 'jwks_cache.json'
+        if not os.path.exists(public_key_path):
+            jwks_data = initialize_jwks_cache(public_key_path)
+        else:
+            with open(public_key_path, 'r') as key_file:
+                jwks_data = json.load(key_file)
+
+        kid = get_unverified_header(token)
+
+        # Try to find the key in the cache
+        matching_key_data = next((key for key in jwks_data["keys"] if key["kid"] == kid), None)
+        if matching_key_data:
+            matching_key = jwk.JWK(**matching_key_data)
+            public_key_pem = matching_key.export_to_pem()
+            payload = jwt.decode(token, public_key_pem, algorithms=["RS256"], audience=CLIENT_ID)
+            if payload.get("aud") != CLIENT_ID or payload.get("scp") != required_scopes:
+                raise HTTPException(status_code=401, detail="Invalid audience or scope")
+            return payload
+
+        # Refresh the cache and try again
+        jwks_data = initialize_jwks_cache(public_key_path)
+        matching_key_data = next((key for key in jwks_data["keys"] if key["kid"] == kid), None)
+        if matching_key_data:
+            matching_key = jwk.JWK(**matching_key_data)
+            public_key_pem = matching_key.export_to_pem()
+            payload = jwt.decode(token, public_key_pem, algorithms=["RS256"], audience=CLIENT_ID)
+            if payload.get("aud") != CLIENT_ID or payload.get("scp") != required_scopes:
+                raise HTTPException(status_code=401, detail="Invalid audience or scope")
+            return payload
+
         raise credentials_exception
+    except JWTError as e:
+        raise HTTPException(status_code=401, detail=f"JWT Error: {str(e)}")
 
 
 # Student Props
 @router.get("/students/properties/")
 async def get_student_properties():
     result = await institute_instance.fetch_extensions_student()
+    return result
 
 @router.post("/students/properties/create")
 async def create_student_properties(student_properties: list[dict]):
@@ -63,7 +98,7 @@ async def create_student_properties(student_properties: list[dict]):
 
 @router.delete("/students/properties/delete")
 async def delete_student_properties(student_property_ids: list[str]):
-    await institute_instance.delete_student_properties(properties=student_property_ids)
+    await institute_instance.delete_student_properties(property_ids=student_property_ids)
 
 
 # Course Props
@@ -78,5 +113,9 @@ async def create_course_properties(course_properties: list[dict]):
 
 @router.delete("/courses/properties/delete")
 async def delete_course_properties(course_property_ids: list[str]):
-    await institute_instance.delete_course_properties( properties=course_property_ids)
+    await institute_instance.delete_course_properties( property_ids=course_property_ids)
+@router.post("/institute/setup/")
+async def institute_setup_runtime(manifest:dict):
+    rendered_manifest = await institute_instance.institute_setup_runtime(manifest=manifest)
+    return rendered_manifest
 

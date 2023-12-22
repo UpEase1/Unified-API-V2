@@ -90,15 +90,15 @@ class Students:
         request_body = User()
         request_body.account_enabled = True
         # implement validation of JSON to ensure that the template fields are present
-        display_name = student_extension_properties['Name']
+        display_name = student_extension_properties['name']
         mail = ''.join([word.capitalize() for word in display_name.split()]) + "@v2tzs.onmicrosoft.com"
         password = helpers.password_generate_msft()
         request_body.display_name = display_name
         request_body.mail_nickname = ''.join([word.capitalize() for word in display_name.split()])
         request_body.user_principal_name = mail
         request_body.mail = mail
-        request_body.job_title = student_extension_properties["Position"]
-        request_body.fax_number = student_extension_properties['Registration number']
+        request_body.job_title = student_extension_properties["position"]
+        request_body.fax_number = student_extension_properties['registration_number']
         password_profile = PasswordProfile()
         password_profile.force_change_password_next_sign_in = True
         password_profile.password = password

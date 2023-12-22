@@ -1,0 +1,716 @@
+
+{
+  "Institute":
+    {
+      "name": "Manipal Institute of Technology",
+      "logo": "Link_to_logo",
+      "aishe_code": "C-7252",
+      "whether_academic_departments": true,
+      "whether_academic_admin_units": true,
+      "whether_department_course_codes":true,
+      "highest_functional_role":"HOD",
+      "academic_department_definitions": [
+        {
+          "name": "Aeronautical and Automobile Engineering",
+          "identifier": "AAE",
+          "programs":[
+            {
+                "name": "B.Tech - Aeronautical Engineering",
+                "identifier": null,
+                "program_outcomes":[]
+            },
+            {
+                "name":"B.Tech - Automobile Enginering",
+                "identifier": null,
+                "program_outcomes":[]
+            },
+            {
+                "name":"M.Tech - Automobile Engineering",
+                "identifier": null,
+                "program_outcomes":[]
+            },
+            {
+                "name":"M.Tech - Avionics",
+                "identifier": null,
+                "program_outcomes":[]
+            },
+            {
+                "name":"M.Tech - Defence Technology",
+                "identifier": null,
+                "program_outcomes":[]
+            },
+            {
+                "name":"M.Tech - Applied Computational Fluid Dynamics",
+                "identifier": null,
+                "program_outcomes":[]
+            }
+
+          ]
+        },
+        {
+          "name": "Biomedical Engineering",
+          "identifier": "BME",
+          "programs":[
+            {
+                "name":"B.Tech - Biomedical Engineering",
+                "identifier": null,
+                "program_outcomes":[]
+            }
+          ]
+        },
+        {
+          "name": "Biotechnology",
+          "identifier": "BTE",
+          "programs":[
+            {
+                "name": "B.Tech - Biotechnology",
+                "identifier": null,
+                "program_outcomes":[]
+            },
+            {
+                "name": "M.Tech - Industrial Biotechnology",
+                "identifier": null,
+                "program_outcomes":[]
+            }
+          ]
+        },
+        {
+          "name": "Chemical Engineering",
+          "identifier": "CHE",
+          "programs":[
+            {
+                "name": "B.Tech - Chemical Engineering",
+                "identifier": null,
+                "program_outcomes":[]
+            },
+            {
+                "name": "M.Tech - Chemical Engineering",
+                "identifier": null,
+                "program_outcomes":[]
+            }
+          ]
+        },
+        {
+            "name": "Chemistry",
+            "identifier":"CHM",
+            "programs":[
+                {
+                    "name": "M.Sc - Chemistry",
+                    "identifier": null,
+                    "program_outcomes":[]
+                }
+            ]
+        },
+        {
+          "name": "Civil Engineering",
+          "identifier": "CIE",
+          "programs":[
+            {
+                "name":"B.Tech - Civil Engineering",
+                "identifier": null,
+                "program_outcomes":[]
+            },
+            {
+                "name": "M.Tech - Structural Engineering",
+                "identifier": null,
+                "program_outcomes":[]
+            },
+            {
+                "name": "M.Tech - Construction Engineering and Management",
+                "identifier": null,
+                "program_outcomes":[]
+            },
+            {
+                "name": "M.Tech - Environmental Engineering",
+                "identifier": null,
+                "program_outcomes":[]
+            }
+          ]
+
+        },
+        {
+            "name":"Computer Science and Engineering",
+            "identifier": "CSE",
+            "programs":[
+                {
+                    "name":"B.Tech - Computer Science and Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name":"B.Tech - Artificial Intelligence and Machine Learning",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Computer Science and Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Computer Science and Information Security",
+                    "identifier": null,
+                    "program_outcomes":[]
+                }
+            ]
+        },
+        {
+            "name": "Data Science and Computer Applications",
+            "identifier": "DSE",
+            "programs":[
+                {
+                    "name": "MCA - Master of Computer Applications",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": " B.Tech - Data Science and Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Data Science",
+                    "identifier": null,
+                    "program_outcomes":[]
+                }
+            ]
+
+        },
+        {
+            "name": "Electrical and Electronics Engineering",
+            "identifier":"EEE",
+            "programs": [
+                {
+                    "name": "B.Tech - Electrical and Electronics Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Power Electronics and Drives",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Electric Vehicle Technology",
+                    "identifier": null,
+                    "program_outcomes":[]
+                }
+            ]
+        },
+        {
+            "name": "Electronics and Communication Engineering",
+            "identifier": "ECE",
+            "programs":[
+                {
+                    "name": "B.Tech - Electronics and Communication Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name":"B.Tech - Electronics Engineering (VLSI Design and Technology",
+                    "identifier": null,
+                    "program_outcomes":[] 
+                },
+                {
+                    "name": "M.Tech - Digital Electornics and Communication",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Microelectronics",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Wireless and Mobile Communications",
+                    "identifier": null,
+                    "program_outcomes":[]
+                }
+            ]
+        },
+        {
+            "name": "Humanities and Management",
+            "identifier": "HUM",
+            "programs":[
+                {
+                    "name": "B.Tech - Computer Science and Financial Technology",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Engineering Management",
+                    "identifier": null,
+                    "program_outcomes":[]
+                }
+            ]
+        },
+        {
+            "name": "Information and Communication Technology",
+            "identifier":"ICT",
+            "programs": [
+                {
+                    "name": "B.Tech - Information Technology",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "B.Tech - Computer and Communication Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Software Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Computer Networking and Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Machine Intelligence and Decision Science",
+                    "identifier": null,
+                    "program_outcomes":[]
+                }
+            ]
+        },
+        {
+            "name":"Instrumentation and Control Engineering",
+            "identifier":"ICE",
+            "programs": [
+                {
+                    "name": "B.Tech - Electronics and Instrumentation Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "B.Tech - Cyber Physical Systems",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Embedded Control and Automation",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Internet of Things",
+                    "identifier": null,
+                    "program_outcomes":[]
+                    
+                }
+            ]
+        },
+        {
+            "name": "Mathematics",
+            "identifier":"MAT",
+            "programs":[
+                {
+                    "name":"B.Tech Mathematics and Computing",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Sc - Applied Mathematics and Computing",
+                    "identifier": null,
+                    "program_outcomes":[]
+                }
+            ]
+            
+        },
+        {
+            "name":"Mechanical and Industrial Engineering",
+            "identifier":"MME",
+            "programs": [
+                {
+                    "name": "B.Tech - Mechanical Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "B.Tech - Industrial Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Computer-Aided Analysis and Design",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name":"M.Tech - Manufacturing Engineering",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Thermal Sciences and Energy Systems",
+                    "identifier": null,
+                    "program_outcomes":[]
+                }
+            ]
+        },
+        {
+            "name":"Media Technology",
+            "identifier":"MTE",
+            "programs": [
+                {
+                    "name": "B.Tech - Printing Technology",
+                    "identifier": null,
+                    "program_outcomes":[]
+                },
+                {
+                    "name": "M.Tech - Printing and Media Technology",
+                    "identifier": null,
+                    "program_outcomes":[]
+                }
+            ]
+        },
+        {
+            "name":"Physics",
+            "identifier":"PHY",
+            "programs": [
+                {
+                    "name": "M.Sc - Physics",
+                    "identifier": null,
+                    "program_outcomes":[]
+                }
+            ]
+        }
+      ],
+      "whether_administrative_departments":true,
+      "whether_administrative_admin_units":false,
+      "highest_role_administrative_function":"Director",
+      "permanent_solitary_roles_administrative_function":["Director","Joint Director"],
+
+      "administrative_department_definitions":[
+        {
+            "name":"Academic",
+            "identifier":null,
+            "permanent_roles":["Associate Director", "Assistant Director"]
+        },
+        {
+            "name":"Alumni Affairs",
+            "identifier":null,
+            "permanent_roles":["Associate Director", "Assistant Director"]
+        },
+        {
+            "name": "Office of Industry Liasion, Placement and Practice School",
+            "identifier":"IL,P&PS",
+            "permanent_roles":["Associate Director", "Assistant Director"]
+        },
+        {
+            "name":"Development",
+            "identifier":null,
+            "permanent_roles":["Associate Director", "Assistant Director"]
+        },
+        {
+            "name":"Research and Co-operation",
+            "identifier":"R&C",
+            "permanent_roles":["Associate Director", "Assistant Director"]
+        },
+        {
+            "name":"Student Welfare",
+            "identifier":"SW",
+            "permanent_roles":["Associate Director", "Assistant Director"]
+        },
+        {
+            "name":"FD&W",
+            "identifier":"FD&W",
+            "permanent_roles":["Associate Director", "Assistant Director"]
+        },
+        {
+            "name":"Quality Assurance",
+            "identifier":"QA",
+            "permanent_roles":["Associate Director", "Assistant Director"]
+        }
+      ],
+      "whether_faculty_administrative_positions":true,
+      "whether_non_teaching_administrative_positions":true,
+      "supporting_administrative_department_definitions":[
+        {
+            "name":"Central Computing Facility",
+            "identifier":"CCF",
+            "permanent_roles":[]
+        },
+        {
+            "name":"Innovation Centre",
+            "identifier": "IC",
+            "permanent_roles":["Assistant Director", "Chief Innovation Officer"]
+        },
+        {
+            "name":"Central Library",
+            "identifier":null,
+            "permanent_roles":["Chief Librarian"]
+        },
+        {
+            "name":"Workshop",
+            "identifier":null,
+            "permanent_roles":[]
+        },
+        {
+            "name":"Hostels",
+            "identifier":null,
+            "permanent_roles":["Chief Warden, Warden"]
+
+        },
+        {
+            "name": "Planning and Construction",
+            "identifier":null,
+            "permanent_roles":["Assistant Director"]
+        },
+        {
+            "name": "Security",
+            "identifier":null,
+            "permanent_roles":["Chief Security Officer"]
+
+        },
+        {
+            "name": "Physical Education",
+            "identifier":null,
+            "permanent_roles":["Chief Physical Officer"]
+        }
+      ],
+      "whether_supporting_academic_departments": true,
+      "supporting_academic_department_definitions":[
+        {
+            "name": "Humanities and Management",
+            "identifier": "HUM"
+
+        },
+        {
+            "name": "Mathematics",
+            "identifier": "MAT"
+        }
+      ],
+      "whether_qualifying_exams": true,
+      "qualifying_exams":[
+        {
+            "name": "Manipal Entrance Test (MET)",
+            "weightage": 50
+        },
+        {
+            "name": "12/Pre-University/HSC Boards",
+            "weightage": 50
+        }
+        
+      ],
+      "institute_academic_structure": "Semester"
+
+    },
+    "Courses":{
+        "render_status": "Incomplete",
+        "flexibility_degree": {
+            "course_choice": "variable",
+            "course_timetable": "fixed",
+            "credits_covered_per_term": "fixed"
+        },
+        "course_type_definitions": [
+            {
+                "name": "Core",
+                "whether_gpa": true
+            },
+            {
+                "name": "Lab",
+                "whether_gpa": true
+            },
+            {
+                "name": "Program Elective",
+                "whether_gpa": true
+            },
+            {
+                "name": "Open Elective",
+                "whether_gpa": false
+            },
+            {
+                "name": "Flexible Core",
+                "whether_gpa": false
+            },
+            {
+                "name": "Honours",
+                "whether_gpa": false
+            }
+        ],
+        "whether_flexible_minor_partitions": true,
+        "whether_course_outcomes":true,
+        "whether_multiple_sections":true,
+        "grade_scale": [
+            {
+                "grade": "A+",
+                "scale": 10
+            },
+            {
+                "grade": "A",
+                "scale": 9
+            },
+            {
+                "grade": "B",
+                "scale": 8
+            },
+            {
+                "grade": "C",
+                "scale": 7
+            },
+            {
+                "grade": "D",
+                "scale": 6
+            },
+            {
+                "grade": "E",
+                "scale": 5
+            },
+            {
+                "grade": "F",
+                "scale": 0
+            },
+            {
+                "grade": "I",
+                "scale": 0
+            },
+            {
+                "grade": "DT",
+                "scale": 0
+            }
+        ],
+        "course_identifiers": [
+            {
+                "name": "course_id_auto_generated",
+                "data_type": "String"
+            },
+            {
+                "name": "course_name",
+                "data_type": "String",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "course_begin_date",
+                "data_type": "DateTime",
+                "dir_ext_id": null,
+                "dir_ext_name":null
+            },
+            {
+                "name": "course_end_date",
+                "data_type": "DateTime",
+                "dir_ext_id": null,
+                "dir_ext_name":null
+            },
+            {
+                "name": "course_department_identifier",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name":null,
+                "enum_vals": []
+            },
+            {
+                "name": "course_code",
+                "data_type": "Integer",
+                "dir_ext_id": null,
+                "dir_ext_name":null
+            },
+            {
+                "name": "course_description",
+                "data_type": "String",
+                "dir_ext_id": null,
+                "dir_ext_name":null
+            },
+            {
+                "name": "course_department",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "enum_vals": [],
+                "dir_ext_name":null
+            },
+            {
+                "name": "course_program",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "enum_vals": [],
+                "dir_ext_name":null
+            },
+            {
+                "name": "course_section",
+                "data_type": "String",
+                "dir_ext_id": null,
+                "dir_ext_name":null
+            },
+            {
+                "name": "course_type",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name":null,
+                "enum_vals": null
+            },
+            {
+                "name": "course_weeks",
+                "data_type": "Integer",
+                "dir_ext_id": null,
+                "dir_ext_name":null
+            },
+            {
+                "name": "course_instruction_method",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name":null,
+                "enum_vals": ["online", "offline", "self_paced","correspondence"]
+            },
+            {
+                "name": "classroom_identifier",
+                "data_type": "String",
+                "dir_ext_name":null,
+                "dir_ext_id": null
+            },
+            {
+                "name": "course_faculty_object",
+                "data_type": "struct",
+                "dir_ext_name":null,
+                "dir_ext_id": null,
+                "struct":
+                {
+                    "id": "user-id",
+                    "userPrincipalName": "john.doe@example.com",
+                    "displayName": "John Doe",
+                    "mail": "john.doe@example.com",
+                    "mobilePhone": "+1234567890",
+                    "jobTitle": "Faculty",
+                    "department": "Engineering"
+                }
+            },
+            {
+                "name": "course_gpa_applicability",
+                "data_type": "Boolean",
+                "dir_ext_name":null,
+                "dir_ext_id": null
+            },
+            {
+                "name": "enrolment_capacity",
+                "data_type": "Integer",
+                "dir_ext_name":null,
+                "dir_ext_id": null
+            },
+            {
+                "name": "course_credit",
+                "data_type": "Integer",
+                "dir_ext_name": null,
+                "dir_ext_id": null
+            },
+            {
+                "name": "semester_type_offered",
+                "data_type": "Enum",
+                "dir_ext_id":null,
+                "dir_ext_name":null,
+                "enum_vals":["Odd", "Even", "Odd&Even"]
+            },
+            {
+                "name": "semester_number_offered",
+                "data_type":"Integer",
+                "dir_ext_id":null,
+                "dir_ext_name":null
+            }
+
+            
+
+        ]
+    }
+    
+}

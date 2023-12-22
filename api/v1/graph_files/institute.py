@@ -111,94 +111,62 @@ class Institute:
                 extension_properties.append({"Name": convert_key(value.name), "ID": value.id})
         return extension_properties
     
-    async def delete_student_properties(self,properties):
+    async def delete_student_properties(self,property_ids:list):
         obj_id = self.settings['stu_dir_obj']
-        for property in properties:
-            await self.app_client.applications.by_application_id(obj_id).extension_properties.by_extension_property_id(property['ID']).delete()
+        for property_id in property_ids:
+            await self.app_client.applications.by_application_id(obj_id).extension_properties.by_extension_property_id(property_id).delete()
 
-    async def delete_course_properties(self,properties:list):
+    async def delete_course_properties(self,property_ids:list):
         obj_id = self.settings['course_dir_obj']
-        for property in properties:
-            await self.app_client.applications.by_application_id(obj_id).extension_properties.by_extension_property_id(property).delete()
- 
-    async def create_enum_extension(self,institute_name:str,institute_id:str):
-        request_body = SchemaExtension()
-        request_body.id = f"enums_{institute_name}"
-        request_body.description = f"enum type definitions for {institute_name}"
-        request_body.target_types = ["Organization",]
-        request_body.properties = []
-        result = await self.app_client.schema_extensions.post(request_body)
-        enum_id = result.id
-        institute_data_cosmos = self.container.read_item(partition_key = institute_id, item = institute_id)
-        enum_extension_data = {
-            "Name": f"enums_{institute_name}",
-            "identifier": "enum_extension",
-            "id" : enum_id
-        }
-        institute_data_cosmos['enum_definition'].append(enum_extension_data)
-        self.container.upsert_item(institute_data_cosmos)
-        pass
+        for property_id in property_ids:
+            await self.app_client.applications.by_application_id(obj_id).extension_properties.by_extension_property_id(property_id).delete()
 
+# The institute setup runtime is a one-time operation in Copilot Build which sets up the Microsoft Institute manifest. 
+# First, the Institute answers a questionnaire in Copilot Build which generates a form manifest.
+# This form manifest is received and stored in the Cosmos container for that Institute. Its structure is predefined
+# in the institute setup runtime. The runtime creates the necessary Microsoft objects and broad structures using
+# the form manifest and generates a new manifest with the trace of the runtime output. This new manifest is then
+# rendered in Copilot build and its trace is used to define the distinct data structure of various institutes.
+# The institute manifest is the core of Console's flexibility and uses the CEDS data model as its basis with some
+# tweaking for the Indian context.
 
+# Hence, a single application instance is enough for any number of institutes so long as the form manifest structure
+# is same across all of them.
+            
+    async def institute_setup_runtime(self, manifest):
+        course_obj_id = self.settings['course_dir_obj']
+        stu_obj_id = self.settings['stu_dir_obj']
+    # Roles setup TODO
+         # Placeholder
+    # Courses
+        # Check if courses render was successful
+        if manifest["Courses"]["render_status"] == "complete":
+            pass
+        else:
+        # Course property augmentation
+            
+            for course_identifier in manifest["Courses"]["course_identifiers"]:
+                print("Processing:", course_identifier)
+                if course_identifier["data_type"] in ["String", "enum", "struct"]:
+                    data_type = 'String'
+                elif course_identifier["data_type"] in ["Boolean", "DateTime", "Integer"]:
+                    data_type = course_identifier['data_type']
+                else:
+                    data_type = 'String'
+                request_body = ExtensionProperty()
+                request_body.name = re.sub(r'\s', '_', course_identifier["name"])
+                request_body.target_objects = (['Group', ])
+                request_body.data_type = data_type
+                print("Sending request with body:", request_body)
+                result = await self.app_client.applications.by_application_id(course_obj_id).extension_properties.post(request_body)
+                print("Result received:", result.name)
+                course_identifier["dir_ext_id"] = result.id
+                course_identifier["dir_ext_name"] = result.name
 
-        pass
-    async def institute_enums(self,enum_name,enums:list):
-        pass
-
-    async def create_institution_extension_document(self,institute_name:str):
-        details = await self.app_client.organization.get()
-        for val in details.value:
-            institute_id = val.id
-        def create_institute_document(self,institute_name,institute_id):
-            institute_data = {'id': institute_id,  # using course name (In graph) as unique id
-                'courses_manipal': institute_id,
-                'Name':institute_name,
-                }
-
-
-            self.container.create_item(institute_data)
-        create_institute_document(self,institute_id=institute_id,institute_name=institute_name)
-
-
-    # async def student_properties_builder_flow_enum_type(self,schema):
-    #     object_id = self.settings['stu_dir_obj']
-    #     openextensionregistryid = "e911f6e2-2827-4293-9a28-8b3aef5363d0"
-    #     for property in schema:
-    #         request_body = ExtensionProperty()
-    #         request_body.name = re.sub(r'\s', '_', property["Name"])
-    #         request_body.data_type = 'String'
-    #         request_body.target_objects = (['User', ])
-    #         result = await self.app_client.applications.by_application_id(object_id).extension_properties.post(
-    #             request_body)
-    #         property['ID'] = result.id
-    #         request_body_enum = OpenTypeExtension()
-    #         request_body_enum.odata_type ="#microsoft.graph.openTypeExtension"
-    #         request_body_enum.extension_name = f"enum_{property['ID']}_Name"
-    #         request_body_enum.id = f"enum_{property['ID']}_ID"
-    #         enum_properties_dict = {item:item for item in property["Enums"]}
-    #         request_body_enum.additional_data = enum_properties_dict
-    #         result_enums = await self.app_client.users.by_user_id(openextensionregistryid).extensions.post(request_body_enum)
-    #         pass
-
-    async def create_roles(roles:list):
-        #TODO
-        pass
-
-    async def assign_roles(roles:list, user_id:str):
-        #TODO
-        pass
-
-    async def delete_roles(roles:list):
-        #TODO
-        pass
-
-    async def get_roles():
-        pass
-    # Announcements
-
-    # Announcements across an organization are simulated by this methodology:
-    # A private SharePoint list with the end extension "Announcements_UpEase" is created when enable_announcements
-    # is called in the root site of the tenant. The list has the fields "Title", "Description" and "File upload"
-    async def enable_announcements():
-
-        pass
+            # Enum rendering
+            manifest['Courses']['course_identifiers'][4]['enum_vals'] = [dept['identifier'] for dept in manifest['Institute']['academic_department_definitions'] if 'identifier' in dept]
+            manifest['Courses']['course_identifiers'][7]['enum_vals'] = [dept['name'] for dept in manifest['Institute']['academic_department_definitions'] if 'name' in dept]
+            manifest['Courses']['course_identifiers'][8]['enum_vals'] = [program['name'] for department in manifest["Institute"]["academic_department_definitions"] for program in department["programs"]]
+            manifest['Courses']['course_identifiers'][10]['enum_vals'] = [course_type['name'] for course_type in manifest['Courses']['course_type_definitions'] if 'name' in course_type]
+            manifest['Courses']['render_status'] = 'complete'
+            return manifest
