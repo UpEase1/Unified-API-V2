@@ -7,6 +7,7 @@ import os
 from ..graph_files.students import Students
 from ..graph_files.courses import Courses
 from ..graph_files.institute import Institute
+from ..graph_files.grade_routine import Routine
 from public_key_gen import initialize_jwks_cache
 
 from configparser import ConfigParser
@@ -21,6 +22,7 @@ azure_settings = config['azure']
 students_instance = Students(azure_settings)
 courses_instance = Courses(azure_settings)
 institute_instance = Institute(azure_settings)
+routines_instance = Routine(azure_settings)
 CLIENT_ID = azure_settings['clientId']
 security = HTTPBearer()
 
@@ -114,8 +116,13 @@ async def create_course_properties(course_properties: list[dict]):
 @router.delete("/courses/properties/delete")
 async def delete_course_properties(course_property_ids: list[str]):
     await institute_instance.delete_course_properties( property_ids=course_property_ids)
-@router.post("/institute/setup/")
+
+@router.post("/setup/")
 async def institute_setup_runtime(manifest:dict):
     rendered_manifest = await institute_instance.institute_setup_runtime(manifest=manifest)
     return rendered_manifest
 
+@router.get("/routines/{course_id}/{calculated_type}/grades/get")
+async def get_grades_for_course(course_id,calculated_type):
+    grades = await routines_instance.evaluate_grades_for_course(course_id=course_id,grade_type=calculated_type)
+    return grades

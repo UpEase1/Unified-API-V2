@@ -265,6 +265,35 @@ class Courses:
     
     async def add_faculty_to_course(self,course_id,faculty_id):
         pass
+    async def add_assignment_to_course(self, course_id: str, assignments):
+        data = self.container.read_item(item=course_id, partition_key=course_id)
+        
+        # Iterate through each assignment in the assignments list
+        for assignment in assignments:
+            # Find the matching student in the course item
+            course_student = next((s for s in data['students'] if s['student_id'] == assignment['student_id']), None)
+            if course_student:
+                # Check if 'assignments' key exists for the student, if not, create it
+                if 'assignments' not in course_student:
+                    course_student['assignments'] = []
+
+                # Check if the assignment already exists for the student
+                existing_assignment = next((a for a in course_student['assignments'] if a['name'] == assignment['name']), None)
+
+                if existing_assignment:
+                    # Update existing assignment scores
+                    existing_assignment['score'] = assignment['score']
+                    existing_assignment['max'] = assignment['max']
+                else:
+                    # Add new assignment
+                    course_student['assignments'].append({
+                        'name': assignment['name'],
+                        'score': assignment['score'],
+                        'max': assignment['max']
+                    })
+
+        self.container.replace_item(course_id, data)
+
 
     async def get_student_attendance(self, student_id: str, course_ids: list):
         attendance_data = []

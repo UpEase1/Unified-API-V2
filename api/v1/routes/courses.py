@@ -141,3 +141,7 @@ async def retire_course_bulk(course_ids: list):
 @router.put("/courses/{course_id}/attendance/update")
 async def update_attendance_course(course_id:str, attendance_data:list):
     await courses_instance.add_attendance_to_course_students(course_id = course_id, new_attendance_data = attendance_data)
+
+@router.put("/courses/{course_id}/assignment/update")
+async def update_assignment_course(course_id:str,assignments:list):
+    await courses_instance.add_assignment_to_course(course_id=course_id,assignments=assignments)
