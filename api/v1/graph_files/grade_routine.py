@@ -76,7 +76,7 @@ class Routine:
                 for assignment in student['assignments']:
                     total_score = total_score + assignment['score']
                     max_score = max_score + assignment['max']
-                scores.append({'total_score':total_score*100/max_score,'student_id':student['student_id']})
+                scores.append({'total_score':total_score*100/max_score,'student_id':student['student_id'],'student_name':student['student_name']})
             else:
                 print("No assignment data, Error")
         grades = grading_system.calculate_grades(grade_type,scores=scores)
@@ -146,7 +146,7 @@ class GradingSystem:
                 grade = self.get_grade_by_scale(max(absolute_scale, relative_scale))
             else:
                 grade = None
-            student_grades.append({'score':score['total_score'], 'grade':grade, 'student_id':score['student_id']})
+            student_grades.append({'score':score['total_score'], 'grade':grade, 'student_id':score['student_id'], 'student_name':score['student_name']})
 
         return student_grades
     

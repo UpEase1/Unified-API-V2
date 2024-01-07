@@ -45,11 +45,11 @@ class Students:
         student_data = []
         for user in users.value:
             user_data = {}
-            user_data['Name'] = user.display_name
-            user_data['Registration number'] = user.fax_number
-            user_data['id'] = user.id
+            user_data['name'] = user.display_name
+            user_data['registration_number'] = user.fax_number
+            user_data['student_id'] = user.id
             job_title = user.job_title
-            user_data["Position"] = job_title
+            user_data["position"] = job_title
             student_data.append(user_data)
         return student_data
 
@@ -63,12 +63,11 @@ class Students:
     # student and their current values. Each property is editable and when submitted, edits the value for that
     # property. Currently, this function(V1) can only receive the request body for one property edit at a time.
 
-    async def update_student_v1(self, student_id, property_name: str, property_value: str):
+    async def update_student_v1(self, student_id, dir_property_name: str, property_value: str):
         student_dir_app = self.settings['stu_dir_app']
-        dir_property = f"extension_{re.sub('-', '', student_dir_app)}_" + property_name.replace(" ", "_")
         request_body = User()
-        additional_data = {f"{dir_property}": None}
-        additional_data[f"{dir_property}"] = property_value
+        additional_data = {f"{dir_property_name}": None}
+        additional_data[f"{dir_property_name}"] = property_value
         request_body.additional_data = additional_data
         result = await self.app_client.users.by_user_id(student_id).patch(request_body)
         pass
@@ -178,8 +177,8 @@ class Students:
 
         student = await self.app_client.users.by_user_id(id_num).get(request_config)
         student_data = {}
-        student_data["Name"] = student.display_name
-        student_data["Registration number"] = student.fax_number
+        student_data["name"] = student.display_name
+        student_data["registration_number"] = student.fax_number
         student_data['id'] = student.id
         del student.additional_data["@odata.context"]
         student_data["properties"] = student.additional_data
