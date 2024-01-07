@@ -121,9 +121,9 @@ async def update_student(student_id: str, property_name: str, property_value: st
     return JSONResponse({"updated": "ok"}, status.HTTP_200_OK)
 
 @router.post("/add")
-async def create_student(student_data:dict):
-    password_json = await students_instance.student_creation_singular(student_data=student_data)
-    return password_json
+async def create_student(student_properties:dict):
+    password_properties = await students_instance.student_creation_singular(student_properties=student_properties)
+    return password_properties
 
 @router.delete("/remove/{student_id}")
 async def deregister_student(student_id:str):

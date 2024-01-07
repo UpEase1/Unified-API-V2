@@ -110,8 +110,8 @@ async def update_course_by_id(course_id:str,property_name:str, property_value:st
 
 # Create Course
 @router.post("/create")
-async def create_course(course_details:dict):
-    course_id = await courses_instance.create_course(course_details)
+async def create_course(course_properties:dict):
+    course_id = await courses_instance.create_course(course_properties=course_properties)
     return course_id
 
 # Students

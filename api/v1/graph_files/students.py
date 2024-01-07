@@ -84,36 +84,35 @@ class Students:
     # into the frontend, after which the frontend parses it and passes into the request body to bulk create(
     # student_creation_bulk)
 
-    async def student_creation_singular(self, student_extension_properties):
+    async def student_creation_singular(self, student_properties):
         app_id = self.settings['stu_dir_app']
         request_body = User()
         request_body.account_enabled = True
-        # implement validation of JSON to ensure that the template fields are present
-        display_name = student_extension_properties['name']
-        mail = ''.join([word.capitalize() for word in display_name.split()]) + "@v2tzs.onmicrosoft.com"
+        display_name = student_properties[f'extension_{app_id}_student_name']
+        mail = re.sub(' ','_',student_properties[f"extension_{app_id}_student_name"])
         password = helpers.password_generate_msft()
         request_body.display_name = display_name
-        request_body.mail_nickname = ''.join([word.capitalize() for word in display_name.split()])
+        request_body.mail_nickname = re.sub(' ','_',student_properties[f"extension_{app_id}_student_name"])
         request_body.user_principal_name = mail
-        request_body.mail = mail
-        request_body.job_title = student_extension_properties["position"]
-        request_body.fax_number = student_extension_properties['registration_number']
+        request_body.mail = f"{mail}@v2tzs.onmicrosoft.com"
+        request_body.job_title = student_properties[f"extension_{app_id}_position"]
+        request_body.fax_number = student_properties[f'extension_{app_id}_student_registration_number']
         password_profile = PasswordProfile()
         password_profile.force_change_password_next_sign_in = True
         password_profile.password = password
         request_body.password_profile = password_profile
-
-
-        def transform_key(key):
-            return f"extension_{re.sub('-', '', app_id)}_{re.sub(' ', '_', key)}"
-
-        replace_keys = lambda obj: {transform_key(k): replace_keys(v) if isinstance(v, dict) else v for k, v in
-                                    obj.items()}
-        additional_data = replace_keys(student_extension_properties)
+        additional_data = student_properties
         request_body.additional_data = additional_data
+        print(request_body)
         result = await self.app_client.users.post(request_body)
+        print(result)
         student_id = result.id
-        return password,mail,student_id
+        password_properties = {
+            "password": password,
+            "mail": mail,
+            "student_id": student_id
+        }
+        return password_properties
 
     async def student_creation_bulk(self, students_data):
         data_list = []
