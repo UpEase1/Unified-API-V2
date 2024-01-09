@@ -118,7 +118,8 @@ class Courses:
         request_body.security_enabled = False
         request_body.group_types = ["Unified",]
         request_body.description = course_properties[f"extension_{app_id}_course_description"]
-        additional_data = course_properties
+        mandatory_keys = [f"extension_{app_id}_course_name",f"extension_{app_id}_course_type",f"extension_{app_id}_course_description"]
+        additional_data = {k: v for k, v in course_properties.items() if k not in mandatory_keys}
         request_body.additional_data = additional_data
         result = await self.app_client.groups.post(request_body)
         course_id = result.id
@@ -141,6 +142,7 @@ class Courses:
             "course_name": course_name,
             "course_id": course_id
         }
+
     # async def add_students_to_course_v2(self,upsert_data):
     #     course_id = upsert_data['Course ID']
     #     course_name = upsert_data['Course Name']
@@ -334,5 +336,10 @@ class Courses:
 
         return attendance_data
 
-
-
+    async def get_course_attendance(self,course_id):
+        course_data = self.container.read_item(item=course_id, partition_key=course_id)
+        attendance_data = []
+        for student in course_data['students']:
+            student_attendance = {"student_name": student['student_name'], "student_id":student["student_id"],"attendance_dates":student["attendance_dates"]}
+            attendance_data.append(student_attendance)
+        return attendance_data

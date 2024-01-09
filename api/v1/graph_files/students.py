@@ -188,9 +188,10 @@ class Students:
         pass
 
     async def get_courses_of_student(self,student_id):
-        course_ids = []
+        courses = []
         result = await self.app_client.users.by_user_id(student_id).member_of.graph_group.get()
         for val in result.value:
-            course_ids.append(val.id)
-        return course_ids
+            course = {"course_name": val.display_name, "course_id": val.id}
+            courses.append(course)
+        return courses
 

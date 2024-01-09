@@ -103,8 +103,8 @@ async def get_student_by_id(student_id: str):
 
 @router.get("/{student_id}/courses")
 async def get_courses_of_student(student_id:str):
-    course_ids = await students_instance.get_courses_of_student(student_id=student_id)
-    return course_ids
+    courses = await students_instance.get_courses_of_student(student_id=student_id)
+    return courses
 
 @router.get("/{student_id}/attendance")
 async def get_attendance(student_id: str, request:Request, course_ids: str = Query(None, description="Enter comma seperated course ids")):
