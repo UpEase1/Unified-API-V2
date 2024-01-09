@@ -1,30 +1,28 @@
-from fastapi import APIRouter, Request, Query, status, Depends, HTTPException
+from fastapi import APIRouter, Request, Query, status, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jwcrypto import jwk
-import os
 
 from ..graph_files.students import Students
 from ..graph_files.courses import Courses
 from ..graph_files.institute import Institute
 from ..graph_files.grade_routine import Routine
-from public_key_gen import initialize_jwks_cache
 
 from configparser import ConfigParser
 from jose import JWTError, jwt
 from typing import List
+from jwcrypto import jwk
+import os
+from public_key_gen import initialize_jwks_cache
 import json
 
 router = APIRouter()
 config = ConfigParser()
 config.read(['config.cfg', 'config.dev.cfg'])
 azure_settings = config['azure']
-students_instance = Students(azure_settings)
-courses_instance = Courses(azure_settings)
-institute_instance = Institute(azure_settings)
 routines_instance = Routine(azure_settings)
 CLIENT_ID = azure_settings['clientId']
 security = HTTPBearer()
+
 
 # Auth
 def get_token_from_header(request: Request):
@@ -36,6 +34,7 @@ def get_token_from_header(request: Request):
     return token
 
 # Get the unverified header and the kid from the token
+
 
 def get_unverified_header(token):
     unverified_header = jwt.get_unverified_header(token)
@@ -88,36 +87,7 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
         raise HTTPException(status_code=401, detail=f"JWT Error: {str(e)}")
 
 
-# Student Props
-@router.get("/students/properties/")
-async def get_student_properties():
-    result = await institute_instance.fetch_extensions_student()
-    return result
-
-@router.post("/students/properties/create")
-async def create_student_properties(student_properties: list[dict]):
-    result = await institute_instance.student_properties_builder_flow(student_properties)
-
-@router.delete("/students/properties/delete")
-async def delete_student_properties(student_property_ids: list[str]):
-    await institute_instance.delete_student_properties(property_ids=student_property_ids)
-
-
-# Course Props
-@router.get("/courses/properties/")
-async def get_course_properties():
-    result = await institute_instance.fetch_extensions_course()
-    return result
-
-@router.post("/courses/properties/create")
-async def create_course_properties(course_properties: list[dict]):
-    result = await institute_instance.course_properties_builder_flow(course_properties)
-
-@router.delete("/courses/properties/delete")
-async def delete_course_properties(course_property_ids: list[str]):
-    await institute_instance.delete_course_properties( property_ids=course_property_ids)
-
-@router.post("/setup/")
-async def institute_setup_runtime(manifest:dict):
-    rendered_manifest = await institute_instance.institute_setup_runtime(manifest=manifest)
-    return rendered_manifest
+@router.get("/{course_id}/{calculated_type}/grades/get")
+async def get_grades_for_course(course_id, calculated_type):
+    grades = await routines_instance.evaluate_grades_for_course(course_id=course_id,grade_type=calculated_type)
+    return JSONResponse({"grades": grades}, 200)

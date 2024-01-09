@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.v1.routes.courses import router as CoursesRouter
 from api.v1.routes.institute import router as InstituteRouter
 from api.v1.routes.students import router as StudentsRouter
+from api.v1.routes.routines import router as RoutinesRouter
 
 app = FastAPI()
 security = HTTPBearer()
@@ -52,6 +53,8 @@ CLIENT_SECRET = azure_settings['clientSecret']
 app.include_router(StudentsRouter, tags=["Students"], prefix="/api/v1/students")
 app.include_router(CoursesRouter, tags=["Courses"], prefix="/api/v1/courses")
 app.include_router(InstituteRouter, tags=["Institute"], prefix="/api/v1/institute")
+app.include_router(RoutinesRouter, tags=["Routines"], prefix="/api/v1/routines")
+
 
 def get_token_from_header(request: Request):
     auth_header = request.headers.get("Authorization")
