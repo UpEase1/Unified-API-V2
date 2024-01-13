@@ -84,48 +84,39 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
         raise credentials_exception
     except JWTError as e:
         raise HTTPException(status_code=401, detail=f"JWT Error: {str(e)}")
-    
-def get_signed_in_user_id(authorization: HTTPAuthorizationCredentials = Depends(security)) -> str:
-    payload = get_current_user(authorization)
-    user_id = payload.get("user_id")
-
-    if not user_id:
-        raise HTTPException(status_code=401, detail="User ID not found in token")
-
-    return user_id
 
 
 
 # Student Props
-@router.get("/students/properties/")
+@router.get("/students/properties")
 async def get_student_properties():
     result = await institute_instance.fetch_extensions_student()
     return result
 
-@router.post("/students/properties/create")
+@router.post("/students/properties")
 async def create_student_properties(student_properties: list[dict]):
     result = await institute_instance.student_properties_builder_flow(student_properties)
 
-@router.delete("/students/properties/delete")
+@router.delete("/students/properties")
 async def delete_student_properties(student_property_ids: list[str]):
     await institute_instance.delete_student_properties(property_ids=student_property_ids)
 
 
 # Course Props
-@router.get("/courses/properties/")
+@router.get("/courses/properties")
 async def get_course_properties():
     result = await institute_instance.fetch_extensions_course()
     return result
 
-@router.post("/courses/properties/create")
+@router.post("/courses/properties")
 async def create_course_properties(course_properties: list[dict]):
     result = await institute_instance.course_properties_builder_flow(course_properties)
 
-@router.delete("/courses/properties/delete")
+@router.delete("/courses/properties")
 async def delete_course_properties(course_property_ids: list[str]):
     await institute_instance.delete_course_properties( property_ids=course_property_ids)
 
-@router.post("/setup/")
+@router.post("/setup")
 async def institute_setup_runtime(manifest:dict):
     rendered_manifest = await institute_instance.institute_setup_runtime(manifest=manifest)
     return rendered_manifest

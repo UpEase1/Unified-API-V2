@@ -109,14 +109,14 @@ async def update_course_by_id(course_id:str,property_name:str, property_value:st
     return JSONResponse({"updated": "ok"}, status.HTTP_200_OK)
 
 # Create Course
-@router.post("/create")
+@router.post("/")
 async def create_course(course_properties:dict):
     course_id = await courses_instance.create_course(course_properties=course_properties)
     return course_id
 
 # Students
 # ! Return 201 when an entity is added/created
-@router.post("/{course_id}/students/add") 
+@router.post("/{course_id}/students") 
 async def add_students_to_course(course_id:str, request:Request, student_ids:str = Query(None, description="Enter comma seperated student ids")): 
     if student_ids:
         student_ids = student_ids.split(',')
@@ -124,27 +124,27 @@ async def add_students_to_course(course_id:str, request:Request, student_ids:str
     result = await courses_instance.add_students_to_course(student_ids=student_ids,course_id=course_id,students=students_instance)
     return JSONResponse({"created": "ok"}, status.HTTP_201_CREATED)
 
-@router.delete("/{course_id}/students/remove")
+@router.delete("/{course_id}/students")
 async def remove_students_from_course_api(student_ids:list, course_id:str):
     for student_id in student_ids:
         await courses_instance.remove_student_from_course(course_id=course_id,student_id=student_id)
     return JSONResponse({"deleted": "ok"}, status.HTTP_200_OK)
 
 
-@router.delete("/delete")
+@router.delete("/")
 async def retire_course_bulk(course_ids: list):
     for course_id in course_ids:
         await courses_instance.retire_course_by_id(course_id=course_id)
     pass
 
-@router.get("/courses/{course_id}/attendance/get")
+@router.get("/courses/{course_id}/attendance")
 async def get_attendance_by_course_id(course_id:str):
     return await courses_instance.get_course_attendance(course_id = course_id)
 
-@router.put("/courses/{course_id}/attendance/update")
+@router.put("/courses/{course_id}/attendance")
 async def update_attendance_course(course_id:str, attendance_data:list):
     await courses_instance.add_attendance_to_course_students(course_id = course_id, new_attendance_data = attendance_data)
 
-@router.put("/courses/{course_id}/assignment/update")
+@router.put("/courses/{course_id}/assignment")
 async def update_assignment_course(course_id:str,assignments:list):
     await courses_instance.add_assignment_to_course(course_id=course_id,assignments=assignments)

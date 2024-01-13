@@ -120,7 +120,7 @@ async def update_student(student_id: str, property_name: str, property_value: st
     await students_instance.update_student_v1(property_value=property_value,student_id=student_id,property_name=property_name)
     return JSONResponse({"updated": "ok"}, status.HTTP_200_OK)
 
-@router.post("/add")
+@router.post("/")
 async def create_student(student_properties:dict):
     password_properties = await students_instance.student_creation_singular(student_properties=student_properties)
     return password_properties
@@ -129,7 +129,7 @@ async def create_student(student_properties:dict):
 async def deregister_student(student_id:str):
     await students_instance.deregister_student(student_id = student_id)
 
-@router.delete("/remove")
+@router.delete("/")
 async def deregister_students_bulk(student_ids:list):
     for student_id in student_ids:
         await students_instance.deregister_student(student_id = student_id)
