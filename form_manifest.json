@@ -9,6 +9,17 @@
       "whether_academic_admin_units": true,
       "whether_department_course_codes":true,
       "highest_functional_role":"HOD",
+      "primary_role":{
+        "name": "primary_role",
+        "dir_ext_id": null,
+        "dir_ext_name":null,
+        "enum_vals":[
+            "student",
+            "faculty",
+            "employee",
+            "administrator"
+        ]
+      },
       "academic_department_definitions": [
         {
           "name": "Aeronautical and Automobile Engineering",
@@ -495,81 +506,118 @@
         }
         
       ],
-      "institute_academic_structure": "Semester"
+      "institute_academic_structure": "semester"
 
     },
-    "Courses":{
+    "Courses":
+    {
         "render_status": "Incomplete",
-        "flexibility_degree": {
+        "flexibility_degree":
+        {
             "course_choice": "variable",
             "course_timetable": "fixed",
-            "credits_covered_per_term": "fixed"
+            "credits_covered_per_term": "fixed",
+            "whether_multiple_faculty_can_take_a_course":"true"
+            
         },
-        "course_type_definitions": [
+        "course_type_definitions": 
+        [
             {
                 "name": "Core",
-                "whether_gpa": true
+                "whether_gpa": true,
+                "grade_type": "relative"
+                
             },
             {
                 "name": "Lab",
-                "whether_gpa": true
+                "whether_gpa": true,
+                "grade_type": "absolute"
             },
             {
                 "name": "Program Elective",
-                "whether_gpa": true
+                "whether_gpa": true,
+                "grade_type": "relative"
             },
             {
                 "name": "Open Elective",
-                "whether_gpa": false
+                "whether_gpa": false,
+                "grade_type": "absolute"
             },
             {
                 "name": "Flexible Core",
-                "whether_gpa": false
+                "whether_gpa": true,
+                "grade_type": "relative"
             },
             {
                 "name": "Honours",
-                "whether_gpa": false
+                "whether_gpa": false,
+                "grade_type": "absolute"
             }
         ],
         "whether_flexible_minor_partitions": true,
         "whether_course_outcomes":true,
         "whether_multiple_sections":true,
-        "grade_scale": [
+        "grade_type_definitions": 
+        [
             {
                 "grade": "A+",
-                "scale": 10
+                "scale": 10,
+                "rel_rule": "100 >= total_score >= mean + 1.5*std_dev",
+                "abs_rule": "90 <= total_score <= 100",
+                "type": "calculated"
             },
             {
                 "grade": "A",
-                "scale": 9
+                "scale": 9,
+                "rel_rule": "mean + 1.5*std_dev > total_score >= mean + 0.5*std_dev",
+                "abs_rule": "80 <= total_score < 90",
+                "type": "calculated"
             },
             {
                 "grade": "B",
-                "scale": 8
+                "scale": 8,
+                "rel_rule": "mean + 0.5*std_dev > total_score >= mean - 0.5*std_dev",
+                "abs_rule": "70 <= total_score < 80",
+                "type": "calculated"
             },
             {
                 "grade": "C",
-                "scale": 7
+                "scale": 7,
+                "rel_rule": "mean - 0.5*std_dev > total_score >= mean - 1.0*std_dev",
+                "abs_rule": "60 <= total_score < 70",
+                "type": "calculated"
             },
             {
                 "grade": "D",
-                "scale": 6
+                "scale": 6,
+                "rel_rule": "mean - 1.0*std_dev > total_score >= mean - 1.5*std_dev",
+                "abs_rule": "50 <= total_score < 60",
+                "type": "calculated"
+                
             },
             {
                 "grade": "E",
-                "scale": 5
+                "scale": 5,
+                "rel_rule": "mean - 1.5*std_dev > total_score >= mean - 2.0*std_dev",
+                "abs_rule": "40 <= total_score < 50",
+                "type": "calculated"
             },
             {
                 "grade": "F",
-                "scale": 0
+                "scale": 0,
+                "rel_rule": "0 <= total_score < mean - 2.0*std_dev",
+                "abs_rule": "0 < total_score < 40",
+                "type": "calculated"
             },
             {
                 "grade": "I",
-                "scale": 0
+                "scale": 0,
+                "type": "non_calculated"
             },
             {
                 "grade": "DT",
-                "scale": 0
+                "scale": 0,
+                "type": "non_calculated"
             }
         ],
         "course_identifiers": [
@@ -696,7 +744,7 @@
             },
             {
                 "name": "semester_type_offered",
-                "data_type": "Enum",
+                "data_type": "enum",
                 "dir_ext_id":null,
                 "dir_ext_name":null,
                 "enum_vals":["Odd", "Even", "Odd&Even"]
@@ -710,6 +758,183 @@
 
             
 
+        ]
+    },
+    "Students":{
+        "render_status":"Incomplete",
+        "whether_digilocker_sync":false,
+        "document_verification":null,
+        "student_identifiers":[
+            {
+                "name": "student_program",
+                "type": "academic",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name": null,
+                "enum_vals": []
+            },
+            {
+                "name": "student_department",
+                "type": "academic",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name": null,
+                "enum_vals": []
+            },
+            {
+                "name": "student_roll_number",
+                "type": "academic",
+                "data_type": "Integer",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "student_academic_year",
+                "type": "academic",
+                "data_type": "DateTime",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "student_semester",
+                "type": "academic",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name": null,
+                "enum_vals": []
+            },
+            {
+                "name": "student_name",
+                "type": "personal",
+                "data_type": "String",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "student_date_of_birth",
+                "type": "personal",
+                "data_type": "Integer",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "student_gender",
+                "type": "personal",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name": null,
+                "enum_vals": ["male","female","other"]
+            },
+            {
+                "name": "student_blood_group",
+                "type": "personal",
+                "data_type": "String",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "student_nationality",
+                "type": "personal",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name": null,
+                "enum_vals": []
+            },
+            {
+                "name": "student_category_of_admission",
+                "type": "personal",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name": null,
+                "enum_vals": []
+            },
+            {
+                "name": "student_social_category",
+                "type": "personal",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name": null,
+                "enum_vals": []
+            },
+            {
+                "name": "student_mother_tongue",
+                "type": "personal",
+                "data_type": "String",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "student_marital_status",
+                "type": "personal",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name": null,
+                "enum_vals": ["married", "unmarried"]
+            },
+            {
+                "name": "student_domicile_state",
+                "type": "personal",
+                "data_type": "enum",
+                "dir_ext_id": null,
+                "dir_ext_name": null,
+                "enum_vals": []
+            },
+            {
+                "name": "registration_number",
+                "type": "administrative",
+                "data_type": "Integer",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "application_number",
+                "type": "administrative",
+                "data_type": "Integer",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "date_of_joining",
+                "type": "administrative",
+                "data_type": "DateTime",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "mahe_virtual_bank_account_number",
+                "type": "administrative",
+                "data_type": "String",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "mahe_virtual_bank_ifsc_code",
+                "type": "administrative",
+                "data_type": "String",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "student_batch",
+                "type": "administrative",
+                "data_type": "Integer",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "student_contact_number",
+                "type": "contact",
+                "data_type": "Integer",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            },
+            {
+                "name": "student_email_address",
+                "type": "contact",
+                "data_type": "String",
+                "dir_ext_id": null,
+                "dir_ext_name": null
+            }
         ]
     }
     
