@@ -110,8 +110,8 @@ async def update_course_by_id(course_id:str,property_name:str, property_value:st
 
 # Create Course
 @router.post("/create")
-async def create_course(course_details:dict):
-    course_id = await courses_instance.create_course(course_details)
+async def create_course(course_properties:dict):
+    course_id = await courses_instance.create_course(course_properties=course_properties)
     return course_id
 
 # Students
@@ -137,7 +137,14 @@ async def retire_course_bulk(course_ids: list):
         await courses_instance.retire_course_by_id(course_id=course_id)
     pass
 
+@router.get("/courses/{course_id}/attendance/get")
+async def get_attendance_by_course_id(course_id:str):
+    return await courses_instance.get_course_attendance(course_id = course_id)
 
 @router.put("/courses/{course_id}/attendance/update")
 async def update_attendance_course(course_id:str, attendance_data:list):
     await courses_instance.add_attendance_to_course_students(course_id = course_id, new_attendance_data = attendance_data)
+
+@router.put("/courses/{course_id}/assignment/update")
+async def update_assignment_course(course_id:str,assignments:list):
+    await courses_instance.add_assignment_to_course(course_id=course_id,assignments=assignments)

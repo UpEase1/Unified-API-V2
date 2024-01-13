@@ -99,8 +99,8 @@ class Courses:
         # members = await self.app_client.groups.by_group_id(course_id).members.get(request_configuration=member_request_config)
         #del members["@odata.context"]
         course_data = {}
-        course_data["Name"] = course.display_name
-        course_data['id'] = course.id
+        course_data["name"] = course.display_name
+        course_data['course_id'] = course.id
         course_data["properties"] = course.additional_data
         # course_data["members"] = members.value                            # Issue: Member implementation in new library. Issue code commented out.
         return course_data
@@ -108,35 +108,28 @@ class Courses:
     # When a course is created, the course_details parameter is expected. 
     # This course_details parameter has a dynamic schema which is dependent on the course_extension_properties
     # chosen by the institute.
-    async def create_course(self, course_details):
+    async def create_course(self, course_properties):
         app_id = self.settings['course_dir_app']
-        course_name = course_details['Name']
-        course_properties = course_details["Properties"]
-        course_details['Properties']['Type']=course_type
-        course_type = 'Course'
+        course_name = course_properties[f"extension_{app_id}_course_name"]
         request_body = Group()
         request_body.display_name = course_name
         request_body.mail_enabled = True
-        request_body.mail_nickname = re.sub(' ','_',course_details['Name'])
+        request_body.mail_nickname = re.sub(' ','_',course_properties[f"extension_{app_id}_course_name"])
         request_body.security_enabled = False
         request_body.group_types = ["Unified",]
-        request_body.description = course_details['Description']
-        def transform_key(key):
-            return f"extension_{re.sub('-', '', app_id)}_{re.sub(' ', '_', key)}"
-
-        replace_keys = lambda obj: {transform_key(k): replace_keys(v) if isinstance(v, dict) else v for k, v in
-                                    obj.items()}
-        additional_data = replace_keys(course_properties)
+        request_body.description = course_properties[f"extension_{app_id}_course_description"]
+        mandatory_keys = [f"extension_{app_id}_course_name",f"extension_{app_id}_course_type",f"extension_{app_id}_course_description"]
+        additional_data = {k: v for k, v in course_properties.items() if k not in mandatory_keys}
         request_body.additional_data = additional_data
         result = await self.app_client.groups.post(request_body)
         course_id = result.id
-        course_properties['Mail'] = result.mail
-        course_properties['SecurityEnabled'] = result.security_enabled
+        course_properties['mail'] = result.mail
+        course_properties['security_enabled'] = result.security_enabled
         print("Creation of the group in Azure AD was successful")
         def create_course_document(self,course_name):
             course_data = {'id': course_id,  # using course name (In graph) as unique id
                 'courses_manipal': course_id,
-                'Name':course_name,
+                'name':course_name,
                 'students':[],
                 'properties': course_properties,
                 }
@@ -145,8 +138,11 @@ class Courses:
             self.container.create_item(course_data)
         create_course_document(self,course_name=course_name)
         print("Creation of the course in cosmos was successful")
-        return course_id
-    
+        return {
+            "course_name": course_name,
+            "course_id": course_id
+        }
+
     # async def add_students_to_course_v2(self,upsert_data):
     #     course_id = upsert_data['Course ID']
     #     course_name = upsert_data['Course Name']
@@ -209,12 +205,11 @@ class Courses:
     async def remove_student_from_course(self, student_id,course_id):
         await self.app_client.groups.by_group_id(course_id).members.by_directory_object_id(student_id).ref.delete()
 
-    async def update_course_by_id(self, course_id, property_name: str, property_value: str):
+    async def update_course_by_id(self, course_id, dir_property_name: str, property_value: str):
         course_dir_app = self.settings['course_dir_app']
-        dir_property = f"extension_{re.sub('-', '', course_dir_app)}_" + property_name.replace(" ", "_")
         request_body = Group()
-        additional_data = {f"{dir_property}": None}
-        additional_data[f"{dir_property}"] = property_value
+        additional_data = {f"{dir_property_name}": None}
+        additional_data[f"{dir_property_name}"] = property_value
         request_body.additional_data = additional_data
         # Add cosmos db level update request
         result = await self.app_client.groups.by_group_id(course_id).patch(request_body)
@@ -265,6 +260,35 @@ class Courses:
     
     async def add_faculty_to_course(self,course_id,faculty_id):
         pass
+    async def add_assignment_to_course(self, course_id: str, assignments):
+        data = self.container.read_item(item=course_id, partition_key=course_id)
+        
+        # Iterate through each assignment in the assignments list
+        for assignment in assignments:
+            # Find the matching student in the course item
+            course_student = next((s for s in data['students'] if s['student_id'] == assignment['student_id']), None)
+            if course_student:
+                # Check if 'assignments' key exists for the student, if not, create it
+                if 'assignments' not in course_student:
+                    course_student['assignments'] = []
+
+                # Check if the assignment already exists for the student
+                existing_assignment = next((a for a in course_student['assignments'] if a['name'] == assignment['name']), None)
+
+                if existing_assignment:
+                    # Update existing assignment scores
+                    existing_assignment['score'] = assignment['score']
+                    existing_assignment['max'] = assignment['max']
+                else:
+                    # Add new assignment
+                    course_student['assignments'].append({
+                        'name': assignment['name'],
+                        'score': assignment['score'],
+                        'max': assignment['max']
+                    })
+
+        self.container.replace_item(course_id, data)
+
 
     async def get_student_attendance(self, student_id: str, course_ids: list):
         attendance_data = []
@@ -312,5 +336,10 @@ class Courses:
 
         return attendance_data
 
-
-
+    async def get_course_attendance(self,course_id):
+        course_data = self.container.read_item(item=course_id, partition_key=course_id)
+        attendance_data = []
+        for student in course_data['students']:
+            student_attendance = {"student_name": student['student_name'], "student_id":student["student_id"],"attendance_dates":student["attendance_dates"]}
+            attendance_data.append(student_attendance)
+        return attendance_data

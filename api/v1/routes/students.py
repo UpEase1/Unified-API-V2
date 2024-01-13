@@ -90,9 +90,9 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
     except JWTError as e:
         raise HTTPException(status_code=401, detail=f"JWT Error: {str(e)}")
 
-
+# To scope the endpoint add current_user:dict = Depends(get_current_user) to the endpoint funtion
 @router.get("/")
-async def get_all_students(current_user:dict = Depends(get_current_user)):
+async def get_all_students():
     students = await students_instance.get_all_students()
     return students
 
@@ -103,11 +103,11 @@ async def get_student_by_id(student_id: str):
 
 @router.get("/{student_id}/courses")
 async def get_courses_of_student(student_id:str):
-    course_ids = await students_instance.get_courses_of_student(student_id=student_id)
-    return course_ids
+    courses = await students_instance.get_courses_of_student(student_id=student_id)
+    return courses
 
 @router.get("/{student_id}/attendance")
-async def get_attendance(student_id: str, request:Request, course_ids: str = Query(None, description="Enter comma seperated course ids"),current_user:dict =Depends(get_current_user)):
+async def get_attendance(student_id: str, request:Request, course_ids: str = Query(None, description="Enter comma seperated course ids")):
     course_ids = request.query_params.get("course_ids")
     if course_ids:
         course_ids = course_ids.split(",")  
@@ -121,9 +121,9 @@ async def update_student(student_id: str, property_name: str, property_value: st
     return JSONResponse({"updated": "ok"}, status.HTTP_200_OK)
 
 @router.post("/add")
-async def create_students(students_data:list):
-    password_json = await students_instance.student_creation_bulk(students_data=students_data)
-    return password_json
+async def create_student(student_properties:dict):
+    password_properties = await students_instance.student_creation_singular(student_properties=student_properties)
+    return password_properties
 
 @router.delete("/remove/{student_id}")
 async def deregister_student(student_id:str):

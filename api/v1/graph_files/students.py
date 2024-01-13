@@ -45,11 +45,11 @@ class Students:
         student_data = []
         for user in users.value:
             user_data = {}
-            user_data['Name'] = user.display_name
-            user_data['Registration number'] = user.fax_number
-            user_data['id'] = user.id
+            user_data['name'] = user.display_name
+            user_data['registration_number'] = user.fax_number
+            user_data['student_id'] = user.id
             job_title = user.job_title
-            user_data["Position"] = job_title
+            user_data["position"] = job_title
             student_data.append(user_data)
         return student_data
 
@@ -63,12 +63,11 @@ class Students:
     # student and their current values. Each property is editable and when submitted, edits the value for that
     # property. Currently, this function(V1) can only receive the request body for one property edit at a time.
 
-    async def update_student_v1(self, student_id, property_name: str, property_value: str):
+    async def update_student_v1(self, student_id, dir_property_name: str, property_value: str):
         student_dir_app = self.settings['stu_dir_app']
-        dir_property = f"extension_{re.sub('-', '', student_dir_app)}_" + property_name.replace(" ", "_")
         request_body = User()
-        additional_data = {f"{dir_property}": None}
-        additional_data[f"{dir_property}"] = property_value
+        additional_data = {f"{dir_property_name}": None}
+        additional_data[f"{dir_property_name}"] = property_value
         request_body.additional_data = additional_data
         result = await self.app_client.users.by_user_id(student_id).patch(request_body)
         pass
@@ -85,36 +84,35 @@ class Students:
     # into the frontend, after which the frontend parses it and passes into the request body to bulk create(
     # student_creation_bulk)
 
-    async def student_creation_singular(self, student_extension_properties):
+    async def student_creation_singular(self, student_properties):
         app_id = self.settings['stu_dir_app']
         request_body = User()
         request_body.account_enabled = True
-        # implement validation of JSON to ensure that the template fields are present
-        display_name = student_extension_properties['name']
-        mail = ''.join([word.capitalize() for word in display_name.split()]) + "@v2tzs.onmicrosoft.com"
+        display_name = student_properties[f'extension_{app_id}_student_name']
+        mail = re.sub(' ','_',student_properties[f"extension_{app_id}_student_name"])
         password = helpers.password_generate_msft()
         request_body.display_name = display_name
-        request_body.mail_nickname = ''.join([word.capitalize() for word in display_name.split()])
+        request_body.mail_nickname = re.sub(' ','_',student_properties[f"extension_{app_id}_student_name"])
         request_body.user_principal_name = mail
-        request_body.mail = mail
-        request_body.job_title = student_extension_properties["position"]
-        request_body.fax_number = student_extension_properties['registration_number']
+        request_body.mail = f"{mail}@v2tzs.onmicrosoft.com"
+        request_body.job_title = student_properties[f"extension_{app_id}_position"]
+        request_body.fax_number = student_properties[f'extension_{app_id}_student_registration_number']
         password_profile = PasswordProfile()
         password_profile.force_change_password_next_sign_in = True
         password_profile.password = password
         request_body.password_profile = password_profile
-
-
-        def transform_key(key):
-            return f"extension_{re.sub('-', '', app_id)}_{re.sub(' ', '_', key)}"
-
-        replace_keys = lambda obj: {transform_key(k): replace_keys(v) if isinstance(v, dict) else v for k, v in
-                                    obj.items()}
-        additional_data = replace_keys(student_extension_properties)
+        additional_data = student_properties
         request_body.additional_data = additional_data
+        print(request_body)
         result = await self.app_client.users.post(request_body)
+        print(result)
         student_id = result.id
-        return password,mail,student_id
+        password_properties = {
+            "password": password,
+            "mail": mail,
+            "student_id": student_id
+        }
+        return password_properties
 
     async def student_creation_bulk(self, students_data):
         data_list = []
@@ -178,8 +176,8 @@ class Students:
 
         student = await self.app_client.users.by_user_id(id_num).get(request_config)
         student_data = {}
-        student_data["Name"] = student.display_name
-        student_data["Registration number"] = student.fax_number
+        student_data["name"] = student.display_name
+        student_data["registration_number"] = student.fax_number
         student_data['id'] = student.id
         del student.additional_data["@odata.context"]
         student_data["properties"] = student.additional_data
@@ -190,9 +188,10 @@ class Students:
         pass
 
     async def get_courses_of_student(self,student_id):
-        course_ids = []
+        courses = []
         result = await self.app_client.users.by_user_id(student_id).member_of.graph_group.get()
         for val in result.value:
-            course_ids.append(val.id)
-        return course_ids
+            course = {"course_name": val.display_name, "course_id": val.id}
+            courses.append(course)
+        return courses
 
