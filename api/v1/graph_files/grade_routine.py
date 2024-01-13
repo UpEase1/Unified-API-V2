@@ -1,23 +1,10 @@
 import configparser
 from configparser import SectionProxy
-import re
 import numpy as np
-
 from .institute import Institute
 from .students import Students
-from . import helpers
-
 from azure.identity.aio import ClientSecretCredential
-from kiota_authentication_azure.azure_identity_authentication_provider import (
-    AzureIdentityAuthenticationProvider
-)
-from msgraph import GraphRequestAdapter, GraphServiceClient
-from msgraph.generated.applications.get_available_extension_properties import \
-    get_available_extension_properties_post_request_body
-from msgraph.generated.groups.groups_request_builder import GroupsRequestBuilder
-from msgraph.generated.models.group import Group
-from msgraph.generated.models.reference_create import ReferenceCreate
-from msgraph.generated.users.users_request_builder import UsersRequestBuilder
+from msgraph import GraphServiceClient
 from azure.cosmos import CosmosClient, DatabaseProxy
 
 
@@ -29,7 +16,7 @@ students_instance = Students(azure_settings)
 institute_instance = Institute(azure_settings)
 
 
-class Routine:
+class GradeRoutine:
     settings: SectionProxy
     client_credential: ClientSecretCredential
     app_client: GraphServiceClient

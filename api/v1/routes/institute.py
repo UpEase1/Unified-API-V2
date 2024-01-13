@@ -7,7 +7,6 @@ import os
 from ..graph_files.students import Students
 from ..graph_files.courses import Courses
 from ..graph_files.institute import Institute
-from ..graph_files.grade_routine import Routine
 from public_key_gen import initialize_jwks_cache
 
 from configparser import ConfigParser
@@ -22,7 +21,6 @@ azure_settings = config['azure']
 students_instance = Students(azure_settings)
 courses_instance = Courses(azure_settings)
 institute_instance = Institute(azure_settings)
-routines_instance = Routine(azure_settings)
 CLIENT_ID = azure_settings['clientId']
 security = HTTPBearer()
 
@@ -86,6 +84,16 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
         raise credentials_exception
     except JWTError as e:
         raise HTTPException(status_code=401, detail=f"JWT Error: {str(e)}")
+    
+def get_signed_in_user_id(authorization: HTTPAuthorizationCredentials = Depends(security)) -> str:
+    payload = get_current_user(authorization)
+    user_id = payload.get("user_id")
+
+    if not user_id:
+        raise HTTPException(status_code=401, detail="User ID not found in token")
+
+    return user_id
+
 
 
 # Student Props

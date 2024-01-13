@@ -5,8 +5,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from ..graph_files.students import Students
 from ..graph_files.courses import Courses
 from ..graph_files.institute import Institute
-from ..graph_files.grade_routine import Routine
-
+from ..graph_files.grade_routine import GradeRoutine
+from ..graph_files.announcement_routine import AnnouncementRoutine
 from configparser import ConfigParser
 from jose import JWTError, jwt
 from typing import List
@@ -19,7 +19,8 @@ router = APIRouter()
 config = ConfigParser()
 config.read(['config.cfg', 'config.dev.cfg'])
 azure_settings = config['azure']
-routines_instance = Routine(azure_settings)
+grade_routines_instance = GradeRoutine(azure_settings)
+announcement_routines_instance = AnnouncementRoutine(azure_settings)
 CLIENT_ID = azure_settings['clientId']
 security = HTTPBearer()
 
@@ -86,8 +87,20 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
     except JWTError as e:
         raise HTTPException(status_code=401, detail=f"JWT Error: {str(e)}")
 
-
 @router.get("/{course_id}/{calculated_type}/grades/get")
 async def get_grades_for_course(course_id, calculated_type):
-    grades = await routines_instance.evaluate_grades_for_course(course_id=course_id,grade_type=calculated_type)
+    grades = await grade_routines_instance.evaluate_grades_for_course(course_id=course_id,grade_type=calculated_type)
     return JSONResponse({"grades": grades}, 200)
+
+@router.get("/announcements")
+async def get_all_announcements(current_user:dict = Depends(get_current_user)):
+    user_id = current_user["oid"]
+    announcements = await announcement_routines_instance.get_all_announcements(user_id = user_id)
+    return announcements
+
+@router.post("/announcements")
+async def make_announcement(subject:str,announcement_message:str,file_attachments:list,target_group_mails:list, current_user:dict = Depends(get_current_user)):
+    user_id = current_user["oid"]
+    return await announcement_routines_instance.make_announcement_dev(user_id = user_id, subject=subject,announcement_message=announcement_message,file_attachments=file_attachments,target_group_mails=target_group_mails)
+
+    

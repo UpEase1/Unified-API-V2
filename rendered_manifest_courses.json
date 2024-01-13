@@ -7,6 +7,8 @@
     "whether_academic_admin_units": true,
     "whether_department_course_codes": true,
     "highest_functional_role": "HOD",
+    "announcement_admin_email": "announcement_admin@v2tzs.onmicrosoft.com",
+    "announcement_admin_id": "ff26c669-cd6d-4542-ba44-1b09211e5619",
     "primary_role": {
       "name": "primary_role",
       "dir_ext_id": "988af450-4012-4064-9765-2abefb0c7c10",
