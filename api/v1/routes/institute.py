@@ -90,12 +90,9 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
 # Student Props
 @router.get("/students/properties")
 async def get_student_properties():
-    result = await institute_instance.fetch_extensions_student()
+    result = await institute_instance.fetch_extensions_student_manifest()
     return result
 
-@router.post("/students/properties")
-async def create_student_properties(student_properties: list[dict]):
-    result = await institute_instance.student_properties_builder_flow(student_properties)
 
 @router.delete("/students/properties")
 async def delete_student_properties(student_property_ids: list[str]):
@@ -105,7 +102,7 @@ async def delete_student_properties(student_property_ids: list[str]):
 # Course Props
 @router.get("/courses/properties")
 async def get_course_properties():
-    result = await institute_instance.fetch_extensions_course()
+    result = await institute_instance.fetch_extensions_course_manifest()
     return result
 
 @router.post("/courses/properties")
@@ -117,6 +114,6 @@ async def delete_course_properties(course_property_ids: list[str]):
     await institute_instance.delete_course_properties( property_ids=course_property_ids)
 
 @router.post("/setup")
-async def institute_setup_runtime(manifest:dict):
-    rendered_manifest = await institute_instance.institute_setup_runtime(manifest=manifest)
+async def institute_setup_runtime():
+    rendered_manifest = await institute_instance.institute_setup_runtime()
     return rendered_manifest
