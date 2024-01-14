@@ -87,7 +87,7 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
     except JWTError as e:
         raise HTTPException(status_code=401, detail=f"JWT Error: {str(e)}")
 
-@router.get("/{course_id}/{calculated_type}/grades/get")
+@router.get("/{course_id}/{calculated_type}/grades")
 async def get_grades_for_course(course_id, calculated_type):
     grades = await grade_routines_instance.evaluate_grades_for_course(course_id=course_id,grade_type=calculated_type)
     return JSONResponse({"grades": grades}, 200)
