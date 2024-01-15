@@ -134,7 +134,7 @@ class Students:
         student = await self.app_client.users.by_user_id(id_num).get(request_config)
         student_data = {}
         student_data["name"] = student.display_name
-        student_data["registration_number"] = student.fax_number
+        student_data["registration_number"] = int(student.fax_number)
         student_data['id'] = student.id
         del student.additional_data["@odata.context"]
         student_data["properties"] = student.additional_data

@@ -5,6 +5,7 @@ import re
 from .institute import Institute
 from .students import Students
 from . import helpers
+import logging
 
 from azure.identity.aio import ClientSecretCredential
 from kiota_authentication_azure.azure_identity_authentication_provider import (
@@ -25,6 +26,7 @@ azure_settings = config['azure']
 
 students_instance = Students(azure_settings)
 institute_instance = Institute(azure_settings)
+logging.basicConfig(level=logging.WARNING)
 
 class Courses:
     settings: SectionProxy
