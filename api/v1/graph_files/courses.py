@@ -226,11 +226,19 @@ class Courses:
     # Gets students of a course. However, currently it will fetch all members of the M365 group representing the course.
     # To filter for students, we can implement EDU model and run a filter against the ids returned. However, currently
     # We dont have access to the EDU model.
-    async def get_students_of_course(self,course_id:str):     #Issue
+    async def get_students_of_course(self,course_id:str): 
+        query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters(
+            select=['displayName', 'id', 'faxNumber', 'mail'],
+            orderby=['displayName']
+        )
+        request_config = UsersRequestBuilder.UsersRequestBuilderGetRequestConfiguration(
+            query_parameters=query_params
+        )
+        request_config.headers.add("ConsistencyLevel", "eventual")
         student_info = []
-        result = await self.app_client.groups.by_group_id(course_id).members.get()
+        result = await self.app_client.groups.by_group_id(course_id).members.graph_user.get(request_config)
         for value in result.value:
-            student_data = { "id": value.id, "name": value.display_name, "mail": value.mail}
+            student_data = { "id": value.id, "name": value.display_name, "mail": value.mail, "registration_number": value.fax_number}
             student_info.append(student_data)
         return student_info
     

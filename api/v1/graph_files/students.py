@@ -34,20 +34,24 @@ class Students:
 
     async def get_all_students(self):
         query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters(
-            select=['displayName', 'id', 'faxNumber'],
-            orderby=['displayName']
+            select=['displayName', 'id', 'faxNumber','mail','jobTitle'],
+            orderby=['displayName'],
+            filter = "jobTitle eq 'Student'",
+            count = True
         )
+        
         request_config = UsersRequestBuilder.UsersRequestBuilderGetRequestConfiguration(
             query_parameters=query_params
         )
-
-        users = await self.app_client.users.get(request_configuration=request_config)
+        request_config.headers.add("ConsistencyLevel", "eventual")
         student_data = []
+        users = await self.app_client.users.get(request_configuration=request_config)
         for user in users.value:
             user_data = {}
             user_data['name'] = user.display_name
             user_data['registration_number'] = user.fax_number
             user_data['student_id'] = user.id
+            user_data['mail'] = user.mail
             job_title = user.job_title
             user_data["position"] = job_title
             student_data.append(user_data)
