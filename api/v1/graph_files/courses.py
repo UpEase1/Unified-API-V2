@@ -109,7 +109,8 @@ class Courses:
     # This course_details parameter has a dynamic schema which is dependent on the course_extension_properties
     # chosen by the institute.
     async def create_course(self, course_properties):
-        app_id = self.settings['course_dir_app']
+        app_id_fetched = self.settings['course_dir_app']
+        app_id = re.sub(r'-','',app_id_fetched)
         course_name = course_properties[f"extension_{app_id}_course_name"]
         request_body = Group()
         request_body.display_name = course_name
@@ -260,7 +261,7 @@ class Courses:
     
     async def add_faculty_to_course(self,course_id,faculty_id):
         pass
-    async def add_assignment_to_course(self, course_id: str, assignments):
+    async def add_assignment_to_course(self, course_id: str, assignments:list):
         data = self.container.read_item(item=course_id, partition_key=course_id)
         
         # Iterate through each assignment in the assignments list

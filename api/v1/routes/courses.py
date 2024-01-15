@@ -92,12 +92,12 @@ async def get_all_courses():
     courses = await courses_instance.get_all_courses()
     return courses
 
-@router.get("/{course_id}/")
+@router.get("/{course_id}")
 async def get_course_by_id(course_id:str):
     course = await courses_instance.get_course_by_id(course_id=course_id)
     return course
 
-@router.get("/{course_id}/students/")
+@router.get("/{course_id}/students")
 async def get_students_of_course(course_id:str):
     student_ids = await courses_instance.get_students_of_course(course_id = course_id)
     return student_ids
