@@ -101,9 +101,9 @@ async def get_all_announcements(current_user:dict = Depends(get_current_user)):
     return announcements
 
 @router.post("/announcements")
-async def make_announcement(subject:str,announcement_message:str,file_attachments:list,target_group_mails:list, current_user:dict = Depends(get_current_user)):
+async def make_announcement(subject:str,announcement_message:str,file_attachments:list[dict],target_group_mails:list, current_user:dict = Depends(get_current_user)):
     user_id = current_user["oid"]
-    return await announcement_routines_instance.make_announcement_dev(user_id = user_id, subject=subject,announcement_message=announcement_message,file_attachments=file_attachments,target_group_mails=target_group_mails)
+    return await announcement_routines_instance.make_announcement_admin(user_id = user_id, subject=subject,announcement_message=announcement_message,file_attachments=file_attachments,target_group_mails=target_group_mails)
 
 
     

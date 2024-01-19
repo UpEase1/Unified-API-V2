@@ -93,7 +93,7 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
 # To scope the endpoint add current_user:dict = Depends(get_current_user) to the endpoint funtion
 @router.get("/")
 async def get_all_students():
-    students = await students_instance.add_fax_numbers()
+    students = await students_instance.get_all_students()
     return students
 
 @router.get("/{student_id}")

@@ -125,7 +125,7 @@ class AnnouncementRoutine:
                         content_bytes = base64.urlsafe_b64decode(file_attachment["content_bytes"]),
                     )
             attachment_response = await self.app_client.users.by_user_id(user_id).messages.by_message_id(message_id).post(attachment_request_body)
-        await self.app_client.users.by_user_id(user_id).messages.by_message_id(message_id).send.post()
+        await self.app_client.users.by_user_id(user_id).messages.by_message_id(message_id).send()
         return announcement_properties
 
 
