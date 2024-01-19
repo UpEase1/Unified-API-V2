@@ -15,6 +15,7 @@ from api.v1.routes.courses import router as CoursesRouter
 from api.v1.routes.institute import router as InstituteRouter
 from api.v1.routes.students import router as StudentsRouter
 from api.v1.routes.routines import router as RoutinesRouter
+from api.v1.routes.copilot import router as CopilotRouter
 
 app = FastAPI()
 security = HTTPBearer()
@@ -49,6 +50,7 @@ app.include_router(StudentsRouter, tags=["Students"], prefix="/api/v1/students")
 app.include_router(CoursesRouter, tags=["Courses"], prefix="/api/v1/courses")
 app.include_router(InstituteRouter, tags=["Institute"], prefix="/api/v1/institute")
 app.include_router(RoutinesRouter, tags=["Routines"], prefix="/api/v1/routines")
+app.include_router(CopilotRouter, tags=["Copilot"], prefix="/api/v1/copilot")
     
 # To secure an endpoint, add the parameter current_user:dict = Depends(get_current_user) to the requesting function.
 

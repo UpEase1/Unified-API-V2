@@ -34,7 +34,7 @@ class Students:
 
     async def get_all_students(self):
         query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters(
-            select=['displayName', 'id', 'faxNumber','mail','jobTitle'],
+            select=['displayName', 'id', 'faxNumber','mail','jobTitle', 'extension_0a09fe4eefd047798b49f80aaaecb550_student_program'],
             orderby=['displayName'],
             filter = "jobTitle eq 'Student'",
             count = True
@@ -54,6 +54,10 @@ class Students:
             user_data['mail'] = user.mail
             job_title = user.job_title
             user_data["position"] = job_title
+            if user.additional_data:
+                user_data["program"] = user.additional_data['extension_0a09fe4eefd047798b49f80aaaecb550_student_program']
+            else:
+                user_data['program'] = None
             student_data.append(user_data)
         return student_data
 
@@ -151,4 +155,20 @@ class Students:
             course = {"course_name": val.display_name, "course_id": val.id}
             courses.append(course)
         return courses
+
+    async def add_fax_numbers(self):
+        students = await Students.get_all_students(self)
+        reg_number = 200908671
+        i=0
+        for student in students:
+            if student['registration_number'] is None:
+                request_body = User()
+                request_body.fax_number = reg_number+i
+                result = await self.app_client.users.by_user_id(student['student_id']).patch(request_body)
+                print(result)
+            i = i+1
+        return "Success"
+
+
+
 

@@ -93,7 +93,7 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
 # To scope the endpoint add current_user:dict = Depends(get_current_user) to the endpoint funtion
 @router.get("/")
 async def get_all_students():
-    students = await students_instance.get_all_students()
+    students = await students_instance.add_fax_numbers()
     return students
 
 @router.get("/{student_id}")
@@ -124,6 +124,13 @@ async def update_student(student_id: str, property_name: str, property_value: st
 async def create_student(student_properties:dict):
     password_properties = await students_instance.student_creation_singular(student_properties=student_properties)
     return password_properties
+@router.post("/bulk")
+async def create_student_bulk(student_properties_collection:list):
+    password_properties_collection = []
+    for student_properties in student_properties_collection:
+        password_properties = await students_instance.student_creation_singular(student_properties = student_properties)
+        password_properties_collection.append(password_properties)
+    return password_properties_collection
 
 @router.delete("/remove/{student_id}")
 async def deregister_student(student_id:str):
