@@ -30,6 +30,7 @@ from azure.cosmos import CosmosClient, DatabaseProxy
 from msgraph.generated.models.user import User
 from msgraph.generated.users.users_request_builder import UsersRequestBuilder
 from msgraph.generated.users.item.send_mail.send_mail_request_builder import SendMailRequestBuilder
+from msgraph.generated.users.item.messages.item.message_item_request_builder import MessageItemRequestBuilder
 from msgraph.generated.users.item.send_mail.send_mail_post_request_body import SendMailPostRequestBody
 import base64
 from base64 import urlsafe_b64decode, urlsafe_b64encode
@@ -90,7 +91,15 @@ class AnnouncementRoutine:
         await self.app_client.users.by_user_id(user_id).send_mail.post(request_body)
 
     async def get_all_announcements(self, user_id):
-            return await self.app_client.users.by_user_id(user_id).messages.get()
+        query_params = MessageItemRequestBuilder.MessageItemRequestBuilderGetQueryParameters(
+		    select = ["subject","body","bodyPreview","uniqueBody"],
+        )
+        request_configuration = MessageItemRequestBuilder.MessageItemRequestBuilderGetRequestConfiguration(
+            query_parameters = query_params,
+        )
+        request_configuration.headers.add("Prefer", "outlook.body-content-type=\"text\"")
+
+        return await self.app_client.users.by_user_id(user_id).messages.get(request_configuration = request_configuration)
 
     async def make_announcement_dev(self,user_id:str,subject:str,announcement_message:str,file_attachments:list,target_group_mails:list):
         message_request_body = Message(

@@ -70,31 +70,50 @@ class Students:
         result = await self.app_client.users.by_user_id(student_id).patch(request_body)
         pass
 
+    # We don't need to input extension_{app_id}_<property> since we 
+    # are just using those keys as our own reference, and they are not 
+    # passed on to the backend
+    # ? why is registration number being passed
+    # ! generate a registration number server side, not client side
     async def student_creation_singular(self, student_properties):
         app_id_fetched = self.settings['stu_dir_app']
         app_id = re.sub(r'-','',app_id_fetched)
+
         request_body = User()
         request_body.account_enabled = True
-        display_name = student_properties[f'extension_{app_id}_student_name']
-        mail_name = re.sub(r' ', '',student_properties[f"extension_{app_id}_student_name"])
+        
+        display_name = student_properties[f'student_name']
+        mail_name = re.sub(r' ', '',student_properties[f"student_name"])
         mail_domain = "@v2tzs.onmicrosoft.com"
         mail = mail_name + mail_domain
-        password = helpers.password_generate_msft()
+        
         request_body.display_name = display_name
         request_body.mail_nickname = mail_name
         request_body.user_principal_name = mail
         request_body.mail = mail
-        request_body.job_title = student_properties[f"extension_{app_id}_position"]
-        request_body.fax_number = student_properties[f'extension_{app_id}_registration_number']
+        request_body.job_title = student_properties[f"position"]
+        request_body.fax_number = str(student_properties[f'registration_number'])
+
+        password = helpers.password_generate_msft()
         password_profile = PasswordProfile()
         password_profile.force_change_password_next_sign_in = True
         password_profile.password = password
         request_body.password_profile = password_profile
-        mandatory_keys = [f"extension_{app_id}_student_name",f"extension_{app_id}_position",f"extension_{app_id}_student_registration_number"]
+
+        mandatory_keys = [
+            f"student_name",
+            f"position",
+            f"registration_number"
+        ]
+        
+        # TODO all keys in additional data extension_{app_id}_<property>
+
         additional_data = {k: v for k, v in student_properties.items() if k not in mandatory_keys}
         request_body.additional_data = additional_data
+
         result = await self.app_client.users.post(request_body)
         student_id = result.id
+
         password_properties = {
             "password": password,
             "mail": mail,

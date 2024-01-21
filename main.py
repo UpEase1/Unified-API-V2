@@ -56,7 +56,7 @@ app.include_router(CopilotRouter, tags=["Copilot"], prefix="/api/v1/copilot")
 
 @app.exception_handler(ODataError)
 async def odata_error_handler(request: Request, exc: ODataError):
-    logger.error(f"OData Error: {exc.error.code} - {exc.error.message}")
+    logging.error(f"OData Error: {exc.error.code} - {exc.error.message}")
     return JSONResponse(
         status_code=400,
         content={

@@ -6,7 +6,6 @@ import os
 from public_key_gen import initialize_jwks_cache
 import json
 
-
 from ..graph_files.students import Students
 from ..graph_files.courses import Courses
 from ..graph_files.institute import Institute
@@ -93,7 +92,7 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
 # To scope the endpoint add current_user:dict = Depends(get_current_user) to the endpoint funtion
 @router.get("/")
 async def get_all_students():
-    students = await students_instance.add_fax_numbers()
+    students = await students_instance.get_all_students()
     return students
 
 @router.get("/{student_id}")
@@ -124,6 +123,7 @@ async def update_student(student_id: str, property_name: str, property_value: st
 async def create_student(student_properties:dict):
     password_properties = await students_instance.student_creation_singular(student_properties=student_properties)
     return password_properties
+
 @router.post("/bulk")
 async def create_student_bulk(student_properties_collection:list):
     password_properties_collection = []
