@@ -5,6 +5,7 @@ import re
 from .institute import Institute
 from .students import Students
 from . import helpers
+from .config import create_graph_service_client, create_cosmos_service_client
 import logging
 
 from azure.identity.aio import ClientSecretCredential
@@ -30,23 +31,14 @@ logging.basicConfig(level=logging.WARNING)
 
 class Courses:
     settings: SectionProxy
-    client_credential: ClientSecretCredential
-    app_client: GraphServiceClient
-    client:CosmosClient
+
 
     def __init__(self, config: SectionProxy): 
         self.settings = config
-        client_id = self.settings['clientId']
-        tenant_id = self.settings['tenantId']
-        client_secret = self.settings['clientSecret']
-        scopes = ['https://graph.microsoft.com/.default']
-        url = self.settings['YOUR_COSMOS_DB_URL']
-        key = self.settings['YOUR_COSMOS_DB_KEY']
-        self.client = CosmosClient(url,credential=key)
+        self.client = create_cosmos_service_client(config=config)
         self.db = self.client.get_database_client('courses_manipal')
         self.container = self.db.get_container_client('courses_manipal')
-        self.client_credential = ClientSecretCredential(tenant_id, client_id, client_secret)
-        self.app_client = GraphServiceClient(self.client_credential,scopes)
+        self.app_client = create_graph_service_client(config=config)
 
     async def get_all_courses(self):
         query_params = GroupsRequestBuilder.GroupsRequestBuilderGetQueryParameters(
@@ -306,7 +298,7 @@ class Courses:
 
         # Original query without filtering for specific student
         query = """
-        SELECT c.id, c.students ,c.Name
+        SELECT c.id, c.students ,c.name
         FROM c 
         WHERE ARRAY_CONTAINS(@course_ids, c.id)
         """
@@ -319,12 +311,11 @@ class Courses:
             ],
             enable_cross_partition_query=True
         ))
-
         for course_item in course_items:
             student_data = next((student for student in course_item['students'] if student['student_id'] == student_id), None)
             
             if student_data:
-                course_data = {"course_id": course_item['id'],"course_name":course_item['Name']}
+                course_data = {"course_id": course_item['id'],"course_name":course_item['name']}
 
                 # Improved handling of attendance data
                 if 'attendance_dates' in student_data:

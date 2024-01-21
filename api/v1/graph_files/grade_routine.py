@@ -3,6 +3,7 @@ from configparser import SectionProxy
 import numpy as np
 from .institute import Institute
 from .students import Students
+from .config import create_cosmos_service_client,create_graph_service_client
 from azure.identity.aio import ClientSecretCredential
 from msgraph import GraphServiceClient
 from azure.cosmos import CosmosClient, DatabaseProxy
@@ -23,26 +24,13 @@ class GradeRoutine:
     client: CosmosClient
     db: DatabaseProxy
 
-    #? We don't need to store settings, client, client_credential, etc.
+
     def __init__(self, config: SectionProxy): 
         self.settings = config
-
-        self.client = CosmosClient(
-            url=self.settings['YOUR_COSMOS_DB_URL'],
-            credential=self.settings['YOUR_COSMOS_DB_KEY']
-        )
-
+        self.client = create_cosmos_service_client(config)
         self.db = self.client.get_database_client('courses_manipal')
         self.container = self.db.get_container_client('courses_manipal')
-
-        self.client_credential = ClientSecretCredential(
-            tenant_id=self.settings['tenantId'], 
-            client_id=self.settings['clientId'], 
-            client_secret=self.settings['clientSecret']
-        )
-
-        scopes = ['https://graph.microsoft.com/.default']
-        self.app_client = GraphServiceClient(self.client_credential, scopes)
+        self.app_client = create_graph_service_client(config)
 
     async def evaluate_grades_for_course(self, course_id, grade_type):
         query = """

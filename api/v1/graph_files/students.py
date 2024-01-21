@@ -3,6 +3,7 @@ import pandas as pd
 from typing import List
 from typing import Dict
 import re
+from .config import create_graph_service_client
 
 from . import helpers
 
@@ -10,7 +11,7 @@ from azure.identity.aio import ClientSecretCredential
 from kiota_authentication_azure.azure_identity_authentication_provider import (
     AzureIdentityAuthenticationProvider
 )
-from msgraph import GraphServiceClient
+from msgraph import GraphServiceClient,GraphRequestAdapter
 from msgraph.generated.applications.get_available_extension_properties import \
     get_available_extension_properties_post_request_body
 from msgraph.generated.models.password_profile import PasswordProfile
@@ -25,12 +26,7 @@ class Students:
 
     def __init__(self, config: SectionProxy):
         self.settings = config
-        client_id = self.settings['clientId']
-        tenant_id = self.settings['tenantId']
-        client_secret = self.settings['clientSecret']
-        scopes = ['https://graph.microsoft.com/.default']
-        self.client_credential = ClientSecretCredential(tenant_id, client_id, client_secret)
-        self.app_client = GraphServiceClient(self.client_credential,scopes)
+        self.app_client = create_graph_service_client(config)
 
     async def get_all_students(self):
         app_id_fetched = self.settings["stu_dir_app"]
@@ -38,7 +34,7 @@ class Students:
         query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters(
             select=['displayName', 'id', 'faxNumber','mail','jobTitle', 'extension_0a09fe4eefd047798b49f80aaaecb550_student_program'],
             orderby=['displayName'],
-            filter = "jobTitle eq 'Student'",
+            filter = "jobTitle eq 'Student' and jobTitle eq 'student'",
             count = True
         )
         
@@ -93,8 +89,9 @@ class Students:
         request_body.mail_nickname = mail_name
         request_body.user_principal_name = mail
         request_body.mail = mail
-        request_body.employee_type = "student"
-        request_body.fax_number = student_properties[f'registration_number']
+        request_body.employee_type = "Student"
+        request_body.job_title = "Student"
+        request_body.fax_number = str(student_properties['registration_number'])
 
         password = helpers.password_generate_msft()
         password_profile = PasswordProfile()

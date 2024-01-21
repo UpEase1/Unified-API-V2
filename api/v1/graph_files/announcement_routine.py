@@ -6,6 +6,7 @@ import numpy as np
 from .institute import Institute
 from .students import Students
 from . import helpers
+from .config import create_graph_service_client,create_cosmos_service_client
 
 
 
@@ -48,19 +49,12 @@ class AnnouncementRoutine:
     app_client: GraphServiceClient
     client:CosmosClient
 
-    def __init__(self, config: SectionProxy):
+    def __init__(self, config: SectionProxy): 
         self.settings = config
-        client_id = self.settings['clientId']
-        tenant_id = self.settings['tenantId']
-        client_secret = self.settings['clientSecret']
-        scopes = ['https://graph.microsoft.com/.default']
-        url = self.settings['YOUR_COSMOS_DB_URL']
-        key = self.settings['YOUR_COSMOS_DB_KEY']
-        self.client = CosmosClient(url,credential=key)
+        self.client = create_cosmos_service_client(config)
         self.db = self.client.get_database_client('courses_manipal')
         self.container = self.db.get_container_client('courses_manipal')
-        self.client_credential = ClientSecretCredential(tenant_id, client_id, client_secret)
-        self.app_client = GraphServiceClient(self.client_credential,scopes)
+        self.app_client = create_graph_service_client(config)
 
 
     async def make_announcement_admin(self,user_id:str,subject:str,announcement_message:str,file_attachments:list,target_group_mails:list):
