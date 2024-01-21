@@ -88,10 +88,19 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
 
 
 # Student Props
-@router.get("/students/properties")
+@router.get("/students/properties/manifest")
 async def get_student_properties():
     result = await institute_instance.fetch_extensions_student_manifest()
     return result
+
+@router.get("/students/properties/graph")
+async def get_student_properties():
+    result = await institute_instance.fetch_extensions_student_graph()
+    return result
+
+@router.post("/students/properties/graph")
+async def create_student_property(property_name):
+    await institute_instance.create_student_property(property_name = property_name)
 
 
 @router.delete("/students/properties")
@@ -100,9 +109,14 @@ async def delete_student_properties(student_property_ids: list[str]):
 
 
 # Course Props
-@router.get("/courses/properties")
+@router.get("/courses/properties/manifest")
 async def get_course_properties():
     result = await institute_instance.fetch_extensions_course_manifest()
+    return result
+
+@router.get("/courses/properties/graph")
+async def get_course_properties():
+    result = await institute_instance.fetch_extensions_course_graph()
     return result
 
 @router.post("/courses/properties")

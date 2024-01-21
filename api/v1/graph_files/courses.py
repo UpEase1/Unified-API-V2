@@ -113,16 +113,16 @@ class Courses:
     async def create_course(self, course_properties):
         app_id_fetched = self.settings['course_dir_app']
         app_id = re.sub(r'-','',app_id_fetched)
-        course_name = course_properties[f"extension_{app_id}_course_name"]
+        course_name = course_properties['course_name']
         request_body = Group()
         request_body.display_name = course_name
         request_body.mail_enabled = True
-        request_body.mail_nickname = re.sub(' ','_',course_properties[f"extension_{app_id}_course_name"])
+        request_body.mail_nickname = re.sub(' ','_',course_properties['course_name'])
         request_body.security_enabled = False
         request_body.group_types = ["Unified",]
-        request_body.description = course_properties[f"extension_{app_id}_course_description"]
-        mandatory_keys = [f"extension_{app_id}_course_name",f"extension_{app_id}_course_type",f"extension_{app_id}_course_description"]
-        additional_data = {k: v for k, v in course_properties.items() if k not in mandatory_keys}
+        request_body.description = course_properties["course_description"]
+        mandatory_keys = ["course_name","course_type","course_description"]
+        additional_data = {f"extension_{app_id}_{k}": v for k, v in course_properties.items() if k not in mandatory_keys}
         request_body.additional_data = additional_data
         result = await self.app_client.groups.post(request_body)
         course_id = result.id

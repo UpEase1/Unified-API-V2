@@ -43,7 +43,7 @@ class Institute:
         extension_properties =[]
         for value in result.value:
             if value.name[10:42] == re.sub("-", "", application_id):
-                extension_properties.append({"Name": convert_key(value.name), "ID": value.id})
+                extension_properties.append({"Name": convert_key(value.name), "ID": value.id, "data_type": value.data_type})
         return extension_properties
     
     async def fetch_extensions_student_manifest(self):
@@ -77,7 +77,41 @@ class Institute:
         ))
         return query_result[0]["course_identifiers"]
 
-    
+    async def fetch_extensions_course_graph(self):
+        application_id = self.settings['course_dir_app']
+        def convert_key(key):
+            sliced_key = key.split('_', 2)[-1]
+            converted_key = re.sub(r'_', ' ', sliced_key)
+            return converted_key
+        extension_request_body = get_available_extension_properties_post_request_body.GetAvailableExtensionPropertiesPostRequestBody()
+        extension_request_body.is_synced_from_on_premises = False
+        result = await self.app_client.directory_objects.get_available_extension_properties.post(
+            extension_request_body)
+        extension_properties =[]
+        for value in result.value:
+            if value.name[10:42] == re.sub("-", "", application_id):
+                extension_properties.append({"Name": convert_key(value.name), "ID": value.id, "data_type": value.data_type})
+        return extension_properties
+
+    async def create_course_property(self,property_name):
+        object_id = self.settings['course_dir_obj']
+        request_body = ExtensionProperty()
+        request_body.name = re.sub(r'\s', '_', property_name)
+        request_body.data_type = 'String'
+        request_body.target_objects = (['Group', ])
+        result = await self.app_client.applications.by_application_id(object_id).extension_properties.post(
+            request_body)
+        pass
+
+    async def create_student_property(self,property_name):
+        object_id = self.settings['stu_dir_obj']
+        request_body = ExtensionProperty()
+        request_body.name = re.sub(r'\s', '_', property_name)
+        request_body.data_type = 'String'
+        request_body.target_objects = (['User', ])
+        result = await self.app_client.applications.by_application_id(object_id).extension_properties.post(
+            request_body)
+        pass
     
     async def delete_student_properties(self,property_ids:list):
         obj_id = self.settings['stu_dir_obj']

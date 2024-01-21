@@ -33,6 +33,8 @@ class Students:
         self.app_client = GraphServiceClient(self.client_credential,scopes)
 
     async def get_all_students(self):
+        app_id_fetched = self.settings["stu_dir_app"]
+        app_id = re.sub(r'-','',app_id_fetched)
         query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters(
             select=['displayName', 'id', 'faxNumber','mail','jobTitle', 'extension_0a09fe4eefd047798b49f80aaaecb550_student_program'],
             orderby=['displayName'],
@@ -55,7 +57,7 @@ class Students:
             job_title = user.job_title
             user_data["position"] = job_title
             if user.additional_data:
-                user_data["program"] = user.additional_data['extension_0a09fe4eefd047798b49f80aaaecb550_student_program']
+                user_data["program"] = user.additional_data[f'extension_{app_id}_student_program']
             else:
                 user_data['program'] = None
             student_data.append(user_data)
@@ -91,8 +93,8 @@ class Students:
         request_body.mail_nickname = mail_name
         request_body.user_principal_name = mail
         request_body.mail = mail
-        request_body.job_title = student_properties[f"position"]
-        request_body.fax_number = str(student_properties[f'registration_number'])
+        request_body.employee_type = "student"
+        request_body.fax_number = student_properties[f'registration_number']
 
         password = helpers.password_generate_msft()
         password_profile = PasswordProfile()
@@ -106,9 +108,9 @@ class Students:
             f"registration_number"
         ]
         
-        # TODO all keys in additional data extension_{app_id}_<property>
+        # TODO all keys in additional data extension_{app_id}_<property> DONE
 
-        additional_data = {k: v for k, v in student_properties.items() if k not in mandatory_keys}
+        additional_data = {f"extension_{app_id}_{k}": v for k, v in student_properties.items() if k not in mandatory_keys}
         request_body.additional_data = additional_data
 
         result = await self.app_client.users.post(request_body)
@@ -157,7 +159,7 @@ class Students:
         student = await self.app_client.users.by_user_id(id_num).get(request_config)
         student_data = {}
         student_data["name"] = student.display_name
-        student_data["registration_number"] = int(student.fax_number)
+        student_data["registration_number"] = student.fax_number
         student_data['id'] = student.id
         del student.additional_data["@odata.context"]
         student_data["properties"] = student.additional_data
@@ -174,19 +176,6 @@ class Students:
             course = {"course_name": val.display_name, "course_id": val.id}
             courses.append(course)
         return courses
-
-    async def add_fax_numbers(self):
-        students = await Students.get_all_students(self)
-        reg_number = 200908671
-        i=0
-        for student in students:
-            if student['registration_number'] is None:
-                request_body = User()
-                request_body.fax_number = reg_number+i
-                result = await self.app_client.users.by_user_id(student['student_id']).patch(request_body)
-                print(result)
-            i = i+1
-        return "Success"
 
 
 

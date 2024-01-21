@@ -92,7 +92,7 @@ class AnnouncementRoutine:
 
     async def get_all_announcements(self, user_id):
         query_params = MessageItemRequestBuilder.MessageItemRequestBuilderGetQueryParameters(
-		    select = ["subject","body","bodyPreview","uniqueBody"],
+		    select = ["subject","from","body"],
         )
         request_configuration = MessageItemRequestBuilder.MessageItemRequestBuilderGetRequestConfiguration(
             query_parameters = query_params,
