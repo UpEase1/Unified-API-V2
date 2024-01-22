@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Query, status, HTTPException, Depends
+from fastapi import APIRouter, Request, Query, status, HTTPException, Depends, File
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
@@ -8,6 +8,9 @@ from ..graph_files.institute import Institute
 from ..graph_files.grade_routine import GradeRoutine
 from ..graph_files.openai import OpenAI
 from ..graph_files.announcement_routine import AnnouncementRoutine
+
+from ..models.announcements import *
+
 from configparser import ConfigParser
 from jose import JWTError, jwt
 from typing import List
@@ -95,15 +98,24 @@ async def get_grades_for_course(course_id, calculated_type):
     return JSONResponse({"grades": grades}, 200)
 
 @router.get("/announcements")
-async def get_all_announcements(current_user:dict = Depends(get_current_user)):
-    user_id = current_user["oid"]
-    announcements = await announcement_routines_instance.get_all_announcements(user_id = user_id)
+async def get_all_announcements(current_user: dict = Depends(get_current_user)):
+    announcements = await announcement_routines_instance.get_all_announcements(user_id = current_user["oid"])
     return announcements
 
 @router.post("/announcements")
-async def make_announcement(subject:str,announcement_message:str,file_attachments:list[dict],target_group_mails:list, current_user:dict = Depends(get_current_user)):
-    user_id = current_user["oid"]
-    return await announcement_routines_instance.make_announcement_admin(user_id = user_id, subject=subject,announcement_message=announcement_message,file_attachments=file_attachments,target_group_mails=target_group_mails)
+async def make_announcement(
+    add_announcement: AddAnnouncementRequest,
+    file_attachments: list[UploadFile] = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    # return {"file_attachments": file_attachments, "announcements": AddAnnouncementRequest}
+    return await announcement_routines_instance.make_announcement_admin(
+        user_id = current_user["oid"], 
+        subject=add_announcement.subject,
+        announcement_message=add_announcement.announcement_message,
+        file_attachments=file_attachments,
+        target_group_mails=add_announcement.target_group_mails
+    )
 
 
     
