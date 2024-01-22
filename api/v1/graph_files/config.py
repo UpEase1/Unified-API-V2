@@ -2,6 +2,7 @@ from configparser import SectionProxy
 from azure.identity.aio import ClientSecretCredential
 from msgraph import GraphServiceClient
 from azure.cosmos import CosmosClient
+from openai import AsyncAzureOpenAI
 
 
 def create_graph_service_client(config:SectionProxy):
@@ -18,4 +19,12 @@ def create_cosmos_service_client(config):
     key = config['YOUR_COSMOS_DB_KEY']
     cosmos_client = CosmosClient(url,credential=key)
     return cosmos_client
+
+def create_azure_openai_service_client(config):
+    api_key = config["openai_api_key"]
+    api_base = config["openai_api_base"]
+    api_version = config["openai_api_version"]
+    openai_client = AsyncAzureOpenAI(api_key = api_key, api_version = api_version, azure_endpoint=api_base,azure_deployment = 'UpEase-testing' )
+    return openai_client
+    
 
