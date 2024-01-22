@@ -108,7 +108,7 @@ async def make_announcement(
     file_attachments: list[UploadFile] = File(...),
     current_user: dict = Depends(get_current_user)
 ):
-    return {"file_attachments": file_attachments, "announcements": AddAnnouncementRequest}
+    # return {"file_attachments": file_attachments, "announcements": AddAnnouncementRequest}
     return await announcement_routines_instance.make_announcement_admin(
         user_id = current_user["oid"], 
         subject=add_announcement.subject,
