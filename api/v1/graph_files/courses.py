@@ -42,7 +42,7 @@ class Courses:
 
     async def get_all_courses(self):
         query_params = GroupsRequestBuilder.GroupsRequestBuilderGetQueryParameters(
-            select=['displayName', 'id'],
+            select=['displayName', 'id', 'mail'],
             orderby=['displayName']
         )
         request_config = GroupsRequestBuilder.GroupsRequestBuilderGetRequestConfiguration(
@@ -55,6 +55,7 @@ class Courses:
             course_data = {}
             course_data['name'] = group.display_name
             course_data['id'] = group.id
+            course_data['mail'] = group.mail
             courses.append(course_data)
         return courses
         
