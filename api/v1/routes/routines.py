@@ -108,12 +108,18 @@ async def make_announcement(
     file_attachments: list[UploadFile] = File(...),
     current_user: dict = Depends(get_current_user)
 ):
+    file_attachments_graph = []
+    for file_attachment in file_attachments:
+        await file_attachment.seek(0)
+        content_bytes = await file_attachment.read()
+        file_attachment_graph = {"file_name": file_attachment.filename,"content_type": file_attachment.content_type,"content_bytes": content_bytes}
+        file_attachments_graph.append(file_attachment_graph)
     # return {"file_attachments": file_attachments, "announcements": AddAnnouncementRequest}
     return await announcement_routines_instance.make_announcement_admin(
         user_id = current_user["oid"], 
         subject=add_announcement.subject,
         announcement_message=add_announcement.announcement_message,
-        file_attachments=file_attachments,
+        file_attachments=file_attachments_graph,
         target_group_mails=add_announcement.target_group_mails
     )
 

@@ -77,7 +77,7 @@ class AnnouncementRoutine:
                         odata_type = "#microsoft.graph.fileAttachment",
                         name = file_attachment['file_name'],
                         content_type = file_attachment["content_type"],
-                        content_bytes = base64.urlsafe_b64decode(file_attachment["content_bytes"]),
+                        content_bytes = file_attachment["content_bytes"],
                     ) for file_attachment in file_attachments
                 ],
             ),
