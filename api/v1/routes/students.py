@@ -121,7 +121,7 @@ async def update_student(student_id: str, property_name: str, property_value: st
 
 @router.post("/")
 async def create_student(student_properties:dict):
-    password_properties = await students_instance.student_creation_bulk(student_properties=student_properties)
+    password_properties = await students_instance.student_creation_singular(student_properties=student_properties)
     return password_properties
 
 @router.post("/bulk")
