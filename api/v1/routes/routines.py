@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Query, status, HTTPException, Depends, File
+from fastapi import APIRouter, Request, Query, status, HTTPException, Depends, File, Form
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
@@ -104,17 +104,19 @@ async def get_all_announcements(current_user: dict = Depends(get_current_user)):
 
 @router.post("/announcements")
 async def make_announcement(
-    add_announcement: AddAnnouncementRequest,
+    subject: str = Form(...),
+    announcement_message: str = Form(...),
+    target_group_mails: list[str] = Form(...),
     file_attachments: list[UploadFile] = File(...),
     current_user: dict = Depends(get_current_user)
 ):
-    # return {"file_attachments": file_attachments, "announcements": AddAnnouncementRequest}
+    # return {"file_attachments": file_attachments[0, "announcements": subject}
     return await announcement_routines_instance.make_announcement_admin(
         user_id = current_user["oid"], 
-        subject=add_announcement.subject,
-        announcement_message=add_announcement.announcement_message,
+        subject=subject,
+        announcement_message=announcement_message,
         file_attachments=file_attachments,
-        target_group_mails=add_announcement.target_group_mails
+        target_group_mails=target_group_mails
     )
 
 
