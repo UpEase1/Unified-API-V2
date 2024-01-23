@@ -102,7 +102,8 @@ async def get_all_announcements(current_user: dict = Depends(get_current_user)):
     announcements = await announcement_routines_instance.get_all_announcements(user_id = current_user["oid"])
     return announcements
 
-@router.post("/announcements")
+
+@router.post("/announcements")  
 async def make_announcement(
     subject: str = Form(...),
     announcement_message: str = Form(...),
@@ -111,13 +112,12 @@ async def make_announcement(
     current_user: dict = Depends(get_current_user)
 ):
     # return {"file_attachments": file_attachments[0, "announcements": subject}
-    return await announcement_routines_instance.make_announcement_admin(
+    return await announcement_routines_instance.make_announcement_admin_dev(
         user_id = current_user["oid"], 
         subject=subject,
         announcement_message=announcement_message,
         file_attachments=file_attachments,
         target_group_mails=target_group_mails
     )
-
 
     
