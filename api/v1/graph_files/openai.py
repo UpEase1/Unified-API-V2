@@ -103,7 +103,7 @@ class OpenAI:
             )
             return third_response.choices[0].message.content
         else:
-            return first_response
+            return first_response.choices[0].message.content
             
 
 
