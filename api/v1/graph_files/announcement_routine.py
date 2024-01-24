@@ -72,15 +72,35 @@ class AnnouncementRoutine:
 
     async def get_all_announcements(self, user_id):
         query_params = MessageItemRequestBuilder.MessageItemRequestBuilderGetQueryParameters(
-		    select = ["subject","from","body"],
+                select = ["subject","body","bodyPreview","uniqueBody"],
         )
+
         request_configuration = MessageItemRequestBuilder.MessageItemRequestBuilderGetRequestConfiguration(
-            query_parameters = query_params,
+        query_parameters = query_params,
         )
         request_configuration.headers.add("Prefer", "outlook.body-content-type=\"text\"")
 
-        return await self.app_client.users.by_user_id(user_id).messages.get(request_configuration = request_configuration)
+        messages = await self.app_client.users.by_user_id(user_id).messages.get(request_configuration = request_configuration)
 
-        
+        messages_list = messages.backing_store.get("value")
 
+        final_messages_list = []
+
+        for message in messages_list:
+            # attachments = await self.app_client.users.by_user_id(user_id).messages.by_message_id(message.id).attachments.get()
+
+            # final_attachments_list = []
+
+            # for attachment in attachments.backing_store.get("value"):
+            #     print(dir(attachment))
+            #     final_attachments_list.append(attachment.content_bytes)
+
+            final_messages_list.append({
+                "subject": message.subject,
+                "content": message.body.content,
+                # "attachments": final_attachments_list
+            })           
         
+        return final_messages_list
+    
+    # todo Get attachment by id
