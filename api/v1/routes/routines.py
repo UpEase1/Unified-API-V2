@@ -112,7 +112,7 @@ async def make_announcement(
     current_user: dict = Depends(get_current_user)
 ):
     # return {"file_attachments": file_attachments[0, "announcements": subject}
-    return await announcement_routines_instance.make_announcement_admin_dev(
+    return await announcement_routines_instance.make_announcement_admin(
         user_id = current_user["oid"], 
         subject=subject,
         announcement_message=announcement_message,
