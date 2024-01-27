@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     container_name: api
     ports:
-      - 8000:80
+      - 8080:8080
     restart: always
 
   swag:
@@ -30,3 +30,7 @@ services:
     restart: unless-stopped
     volumes:
       - /home/appdata/swag:/config
+
+          - 8080:8080
+    
+    
