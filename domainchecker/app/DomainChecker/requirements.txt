@@ -82,4 +82,5 @@ websockets==11.0.3
 jwcrypto
 openai
 python-jose
+gunicorn
 
