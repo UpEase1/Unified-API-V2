@@ -1,17 +1,32 @@
-version: "3.7"
-
+version: "3.9"
 services:
-    web:
-        build: nginx
-        ports:
-          - 80:80
-          - 443:443
-        depends_on:
-          - api
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api
+    ports:
+      - 8000:80
+    restart: always
 
-    api:
-        build: domainchecker
-        environment:
-          - PORT=8080
-        ports:
-          - 8080:8080
+  swag:
+    image: lscr.io/linuxserver/swag:latest
+    container_name: swag
+    depends_on:
+      - api
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata
+      - URL=upease.biz
+      - SUBDOMAINS=test
+      - ONLY_SUBDOMAINS=true
+      - VALIDATION=http # ? Possibly change to dns?
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped
+    volumes:
+      - /home/appdata/swag:/config
