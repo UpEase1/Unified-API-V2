@@ -3,14 +3,11 @@ import pandas as pd
 from typing import List
 from typing import Dict
 import re
-from .config import create_graph_service_client
 
 from . import helpers
+from .singletons import GraphServiceClientSingleton
 
 from azure.identity.aio import ClientSecretCredential
-from kiota_authentication_azure.azure_identity_authentication_provider import (
-    AzureIdentityAuthenticationProvider
-)
 from msgraph import GraphServiceClient,GraphRequestAdapter
 from msgraph.generated.applications.get_available_extension_properties import \
     get_available_extension_properties_post_request_body
@@ -26,7 +23,7 @@ class Students:
 
     def __init__(self, config: SectionProxy):
         self.settings = config
-        self.app_client = create_graph_service_client(config)
+        self.app_client = GraphServiceClientSingleton.get_instance()
 
     async def get_all_students(self):
         app_id_fetched = self.settings["stu_dir_app"]

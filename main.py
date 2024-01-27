@@ -25,6 +25,7 @@ origins = [
     "http://localhost:8100",
     "https://student.upease.biz",
     "https://console.upease.biz",
+    "http://localhost:3000"
 ]
 app.add_middleware(
     CORSMiddleware,

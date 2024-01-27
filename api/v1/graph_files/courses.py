@@ -1,18 +1,11 @@
-import configparser
+
 from configparser import SectionProxy
 import re
-
-from .institute import Institute
+from .singletons import GraphServiceClientSingleton, CosmosServiceClientSingleton
 from .students import Students
 from . import helpers
-from .config import create_graph_service_client, create_cosmos_service_client
-import logging
 
-from azure.identity.aio import ClientSecretCredential
-from kiota_authentication_azure.azure_identity_authentication_provider import (
-    AzureIdentityAuthenticationProvider
-)
-from msgraph import GraphRequestAdapter, GraphServiceClient
+from msgraph import  GraphServiceClient
 from msgraph.generated.applications.get_available_extension_properties import \
     get_available_extension_properties_post_request_body
 from msgraph.generated.groups.groups_request_builder import GroupsRequestBuilder
@@ -21,24 +14,17 @@ from msgraph.generated.models.reference_create import ReferenceCreate
 from msgraph.generated.users.users_request_builder import UsersRequestBuilder
 from azure.cosmos import CosmosClient
 
-config = configparser.ConfigParser()
-config.read(['config.cfg', 'config.dev.cfg'])
-azure_settings = config['azure']
-
-students_instance = Students(azure_settings)
-institute_instance = Institute(azure_settings)
-logging.basicConfig(level=logging.WARNING)
-
 class Courses:
     settings: SectionProxy
+    app_client:GraphServiceClient
 
 
-    def __init__(self, config: SectionProxy): 
-        self.settings = config
-        self.client = create_cosmos_service_client(config=config)
-        self.db = self.client.get_database_client('courses_manipal')
+    def __init__(self, config: SectionProxy):
+        self.settings = config 
+        self.app_client = GraphServiceClientSingleton.get_instance()
+        self.cosmos_client = CosmosServiceClientSingleton.get_instance()
+        self.db = self.cosmos_client.get_database_client('courses_manipal')
         self.container = self.db.get_container_client('courses_manipal')
-        self.app_client = create_graph_service_client(config=config)
 
     async def get_all_courses(self):
         query_params = GroupsRequestBuilder.GroupsRequestBuilderGetQueryParameters(
@@ -91,7 +77,7 @@ class Courses:
 		# 'ConsistencyLevel' : "eventual",
         # })
 
-        # members = await self.app_client.groups.by_group_id(course_id).members.get(request_configuration=member_request_config)
+        # members = await self.client.app_client.groups.by_group_id(course_id).members.get(request_configuration=member_request_config)
         #del members["@odata.context"]
         course_data = {}
         course_data["name"] = course.display_name
@@ -157,7 +143,7 @@ class Courses:
     #         student_name = student['Name']
     #         registration_number = student['Registration number']
     #         request_body.odata_id = f"https://graph.microsoft.com//v1.0//directoryObjects//{student['id']}"
-    #         await self.app_client.groups.by_group_id(course_id).members.ref.post(request_body)
+    #         await self.client.app_client.groups.by_group_id(course_id).members.ref.post(request_body)
     #         add_student_to_course_document(self,course_id=course_id,student_name=student_name,registration_number=registration_number,course_name = course_name)
 
 
@@ -182,8 +168,8 @@ class Courses:
         for student_id in student_ids:
             request_body = ReferenceCreate()
             data = await students.get_student_by_id(id_num=student_id)
-            student_name = data['Name']
-            registration_number = data['Registration number']
+            student_name = data['name']
+            registration_number = data['registration_number']
             request_body.odata_id = f"https://graph.microsoft.com//v1.0//directoryObjects//{student_id}"
             await self.app_client.groups.by_group_id(course_id).members.ref.post(request_body)
             add_student_to_course_document(self,course_id=course_id,student_name=student_name,registration_number=registration_number,student_id = student_id)
@@ -346,3 +332,4 @@ class Courses:
             student_attendance = {"student_name": student['student_name'], "student_id":student["student_id"],"attendance_dates":student["attendance_dates"]}
             attendance_data.append(student_attendance)
         return attendance_data
+

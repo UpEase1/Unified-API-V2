@@ -3,32 +3,25 @@ from azure.identity.aio import ClientSecretCredential
 import re
 import copy
 from azure.cosmos import CosmosClient
-import numpy as np
 from msgraph import GraphServiceClient
 from msgraph.generated.applications.get_available_extension_properties import \
     get_available_extension_properties_post_request_body
 from msgraph.generated.models.extension_property import ExtensionProperty
 from msgraph.generated.models.schema_extension import SchemaExtension
+from .singletons import GraphServiceClientSingleton,CosmosServiceClientSingleton
 
 class Institute:
     settings: SectionProxy
     client_credential: ClientSecretCredential
     app_client: GraphServiceClient
-    client:CosmosClient
+    cosmos_client:CosmosClient
 
     def __init__(self, config: SectionProxy):
         self.settings = config
-        client_id = self.settings['clientId']
-        tenant_id = self.settings['tenantId']
-        client_secret = self.settings['clientSecret']
-        scopes = ['https://graph.microsoft.com/.default']
-        url = self.settings['YOUR_COSMOS_DB_URL']
-        key = self.settings['YOUR_COSMOS_DB_KEY']
-        self.client = CosmosClient(url,credential=key)
-        self.db = self.client.get_database_client('courses_manipal')
+        self.cosmos_client = CosmosServiceClientSingleton.get_instance()
+        self.db = self.cosmos_client.get_database_client('courses_manipal')
         self.container = self.db.get_container_client('courses_manipal')
-        self.client_credential = ClientSecretCredential(tenant_id, client_id, client_secret)
-        self.app_client = GraphServiceClient(self.client_credential,scopes)
+        self.app_client = GraphServiceClientSingleton.get_instance()
 
     async def fetch_extensions_student_graph(self):
         application_id = self.settings['stu_dir_app']

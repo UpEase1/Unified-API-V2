@@ -1,20 +1,8 @@
 import configparser
 from configparser import SectionProxy
-import re
-import numpy as np
-
 from .institute import Institute
 from .students import Students
-from . import helpers
-from .config import create_graph_service_client,create_cosmos_service_client
-
-
-
-from azure.identity.aio import ClientSecretCredential
-from kiota_authentication_azure.azure_identity_authentication_provider import (
-    AzureIdentityAuthenticationProvider
-)
-from msgraph import GraphRequestAdapter, GraphServiceClient
+from .singletons import CosmosServiceClientSingleton, GraphServiceClientSingleton
 from msgraph.generated.models.item_body import ItemBody
 from msgraph.generated.models.message import Message
 from msgraph.generated.models.body_type import BodyType
@@ -37,10 +25,10 @@ class AnnouncementRoutine:
 
     def __init__(self, config: SectionProxy): 
         self.settings = config
-        self.client = create_cosmos_service_client(config)
-        self.db = self.client.get_database_client('courses_manipal')
+        self.app_client = GraphServiceClientSingleton.get_instance()
+        self.cosmos_client = CosmosServiceClientSingleton.get_instance()
+        self.db = self.cosmos_client.get_database_client('courses_manipal')
         self.container = self.db.get_container_client('courses_manipal')
-        self.app_client = create_graph_service_client(config)
 
 
     async def make_announcement_admin(self,user_id:str,subject:str,announcement_message:str,file_attachments:list,target_group_mails:list):

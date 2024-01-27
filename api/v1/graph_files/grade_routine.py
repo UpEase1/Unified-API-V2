@@ -3,10 +3,10 @@ from configparser import SectionProxy
 import numpy as np
 from .institute import Institute
 from .students import Students
-from .config import create_cosmos_service_client,create_graph_service_client
 from azure.identity.aio import ClientSecretCredential
 from msgraph import GraphServiceClient
 from azure.cosmos import CosmosClient, DatabaseProxy
+from .singletons import GraphServiceClientSingleton,CosmosServiceClientSingleton
 
 
 config = configparser.ConfigParser()
@@ -27,10 +27,10 @@ class GradeRoutine:
 
     def __init__(self, config: SectionProxy): 
         self.settings = config
-        self.client = create_cosmos_service_client(config)
-        self.db = self.client.get_database_client('courses_manipal')
+        self.cosmos_client = CosmosServiceClientSingleton.get_instance()
+        self.db = self.cosmos_client.get_database_client('courses_manipal')
         self.container = self.db.get_container_client('courses_manipal')
-        self.app_client = create_graph_service_client(config)
+        self.app_client = GraphServiceClientSingleton.get_instance()
 
     async def evaluate_grades_for_course(self, course_id, grade_type):
         query = """
@@ -78,7 +78,7 @@ class GradeRoutine:
 
 
 class GradingRule:
-    def __init__(self, rule_dict):
+    def __init__(self, rule_dict:dict):
         self.grade = rule_dict['grade']
         self.scale = rule_dict.get('scale', None)
         self.abs_rule = rule_dict.get('abs_rule', None)

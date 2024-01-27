@@ -3,7 +3,7 @@ import string
 from configparser import SectionProxy
 import pandas as pd
 import re
-from .config import create_graph_service_client
+from .singletons import GraphServiceClientSingleton
 
 from azure.identity.aio import ClientSecretCredential
 from kiota_authentication_azure.azure_identity_authentication_provider import (
@@ -20,7 +20,7 @@ class Helpers:
     app_client: GraphServiceClient
 
     def __init__(self,config:SectionProxy):
-        self.app_client = create_graph_service_client(config)
+        self.app_client = GraphServiceClientSingleton.get_instance()
 
 def convert_key(key):
     sliced_key = key.split('_', 2)[-1]

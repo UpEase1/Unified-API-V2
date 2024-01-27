@@ -1,12 +1,10 @@
 from configparser import SectionProxy
-from openai import AsyncAzureOpenAI
-from azure.cosmos import CosmosClient
+from .singletons import CosmosServiceClientSingleton,AsyncAzureOpenAIClientSingleton
 import json
 import configparser
 from ..graph_files.students import Students
 from ..graph_files.courses import Courses
 from ..graph_files.institute import Institute
-from ..graph_files.config import create_cosmos_service_client,create_graph_service_client, create_azure_openai_service_client
 
 config = configparser.ConfigParser()
 config.read(['config.cfg', 'config.dev.cfg'])
@@ -22,16 +20,16 @@ class OpenAI:
 
     def __init__(self, config:SectionProxy):
         self.settings = config
-        self.cosmos_client = create_cosmos_service_client(config)
+        self.cosmos_client = CosmosServiceClientSingleton.get_instance()
         self.db = self.cosmos_client.get_database_client('courses_manipal')
         self.container = self.db.get_container_client('courses_manipal')
-        self.app_client = create_azure_openai_service_client(config)
+        self.app_client = AsyncAzureOpenAIClientSingleton.get_azure_openai_client()
 
 
     async def make_openai_call(self,query:str):
         max_completion_tokens = 2048
-        first_system_prompt = """ If the query pertains to asking for attendance of a particular student or a group of students then return 'send_all_student_details'.
-         If the query pertains to asking for attendance of a group of students in a course, then return 'send_all_course_details'.
+        first_system_prompt = """ If the query pertains to asking/analyzing for attendance of a particular student or a group of students then return 'send_all_student_details'.
+         If the query pertains to asking/analyzing for attendance of a group of students in a course, then return 'send_all_course_details'.
          Else, return 'unsupported request'"""
         second_system_prompt = """ If the query refers to a student name or a group of student names, and you are able to identify the students from the given data, provide the student IDs of those students mentioned in the query as a list object (With the brackets) from the data. Dont respond anything else at all except the list. Ignore anything else asked in the query and do not respond to that. Do not ask for any other information or provide additional details. Similarly, if the query pertains to a course or multiple courses and you can identify the courses from the data provided, then provide a list of only those course IDs as a list object (With the brackets) from the data. Dont respond anything else at all except the list.. """
         third_system_prompt = """ Respond to the query as requested using the data provided to your best ability. If you see attendance data(Like attendance record), assume it is relevant to the requested student/course"""
