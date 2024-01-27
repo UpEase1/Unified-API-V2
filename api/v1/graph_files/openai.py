@@ -28,8 +28,8 @@ class OpenAI:
 
     async def make_openai_call(self,query:str):
         max_completion_tokens = 2048
-        first_system_prompt = """ If the query pertains to asking/analyzing for attendance of a particular student or a group of students then return 'send_all_student_details'.
-         If the query pertains to asking/analyzing for attendance of a group of students in a course, then return 'send_all_course_details'.
+        first_system_prompt = """ If the query pertains to asking/analyzing for attendance of a particular student or a group of students then return 'send_all_student_details'. Example: "Query: Analyse the attendance of Raghav Mishra" Response: "send_all_student_details"
+         If the query pertains to asking/analyzing for attendance of a group of students in a course, then return 'send_all_course_details'. Example: "Query: Analyse the attendance of Spacecraft Principles Course and Generic Aeronautical Course" Response from GPT should be only "send_all_course_details"
          Else, return 'unsupported request'"""
         second_system_prompt = """ If the query refers to a student name or a group of student names, and you are able to identify the students from the given data, provide the student IDs of those students mentioned in the query as a list object (With the brackets) from the data. Dont respond anything else at all except the list. Ignore anything else asked in the query and do not respond to that. Do not ask for any other information or provide additional details. Similarly, if the query pertains to a course or multiple courses and you can identify the courses from the data provided, then provide a list of only those course IDs as a list object (With the brackets) from the data. Dont respond anything else at all except the list.. """
         third_system_prompt = """ Respond to the query as requested using the data provided to your best ability. If you see attendance data(Like attendance record), assume it is relevant to the requested student/course"""
@@ -43,7 +43,7 @@ class OpenAI:
             frequency_penalty=0,
             presence_penalty=0
             )
-        if first_response.choices[0].message.content == 'send_all_student_details':
+        if "send_all_student_details" in first_response.choices[0].message.content:
             student_details = json.dumps(await students_instance.get_all_students())
             prompt = second_system_prompt + "\n" + query + student_details
             second_response = await self.app_client.chat.completions.create(
@@ -73,7 +73,7 @@ class OpenAI:
             )
             return third_response.choices[0].message.content
         
-        elif first_response.choices[0].message.content == 'send_all_course_details':
+        elif "send_all_course_details" in first_response.choices[0].message.content:
             course_details = json.dumps(await courses_instance.get_all_courses())
             prompt = second_system_prompt + "\n" + query + "start_course_details" + course_details + "end_course_details"
             second_response = await self.app_client.chat.completions.create(

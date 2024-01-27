@@ -1,0 +1,4 @@
+.venv/
+__blobstorage__
+__pycache__
+__queuestorage__
