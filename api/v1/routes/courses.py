@@ -141,7 +141,7 @@ async def retire_course_bulk(course_ids: list):
 async def get_attendance_by_course_id(course_id:str):
     return await courses_instance.get_course_attendance(course_id = course_id)
 
-@router.put("/courses/{course_id}/attendance")
+@router.post("/courses/{course_id}/attendance")
 async def update_attendance_course(course_id:str, attendance_data:list):
     await courses_instance.add_attendance_to_course_students(course_id = course_id, new_attendance_data = attendance_data)
 
