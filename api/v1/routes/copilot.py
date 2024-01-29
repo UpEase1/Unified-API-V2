@@ -84,5 +84,5 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
         raise HTTPException(status_code=401, detail=f"JWT Error: {str(e)}")
 
 @router.get("/insights")
-async def get_insights(query:str):
+async def get_insights(query:str, current_user: dict = Depends(get_current_user)):
     return await openai_api_instance.make_openai_call(query)
