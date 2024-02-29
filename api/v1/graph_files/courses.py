@@ -316,7 +316,7 @@ class Courses:
                     attendance_percentage = (total_present / total_days) * 100 if total_days > 0 else 0
 
                     course_data["attendance_record"] = course_attendance
-                    course_data["attendance_percentage"] = attendance_percentage
+                    course_data["attendance_percentage"] = round(attendance_percentage)
                 else:
                     course_data["attendance_record"] = {}
                     course_data["attendance_percentage"] = 0

@@ -4,6 +4,9 @@ from .config import read_azure_config
 from azure.cosmos import CosmosClient
 from openai import AsyncAzureOpenAI
 
+import semantic_kernel as sk
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion, AzureChatCompletion
+
 azure_config = read_azure_config()
 
 class ClientSecretCredentialSingleton:

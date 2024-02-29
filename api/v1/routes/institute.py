@@ -89,45 +89,45 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
 
 # Student Props
 @router.get("/students/properties/manifest")
-async def get_student_properties(current_user: dict = Depends(get_current_user)):
+async def get_student_properties():
     result = await institute_instance.fetch_extensions_student_manifest()
     return result
 
 @router.get("/students/properties/graph")
-async def get_student_properties(current_user: dict = Depends(get_current_user)):
+async def get_student_properties():
     result = await institute_instance.fetch_extensions_student_graph()
     return result
 
 @router.post("/students/properties/graph")
-async def create_student_property(property_name,current_user: dict = Depends(get_current_user)):
+async def create_student_property(property_name):
     await institute_instance.create_student_property(property_name = property_name)
 
 
 @router.delete("/students/properties")
-async def delete_student_properties(student_property_ids: list[str],current_user: dict = Depends(get_current_user)):
+async def delete_student_properties(student_property_ids: list[str]):
     await institute_instance.delete_student_properties(property_ids=student_property_ids)
 
 
 # Course Props
 @router.get("/courses/properties/manifest")
-async def get_course_properties(current_user: dict = Depends(get_current_user)):
+async def get_course_properties():
     result = await institute_instance.fetch_extensions_course_manifest()
     return result
 
 @router.get("/courses/properties/graph")
-async def get_course_properties(current_user: dict = Depends(get_current_user)):
+async def get_course_properties():
     result = await institute_instance.fetch_extensions_course_graph()
     return result
 
 @router.post("/courses/properties")
-async def create_course_properties(course_properties: list[dict],current_user: dict = Depends(get_current_user)):
+async def create_course_properties(course_properties: list[dict]):
     result = await institute_instance.course_properties_builder_flow(course_properties)
 
 @router.delete("/courses/properties")
-async def delete_course_properties(course_property_ids: list[str],current_user: dict = Depends(get_current_user)):
+async def delete_course_properties(course_property_ids: list[str]):
     await institute_instance.delete_course_properties( property_ids=course_property_ids)
 
 @router.post("/setup")
-async def institute_setup_runtime(current_user: dict = Depends(get_current_user)):
+async def institute_setup_runtime():
     rendered_manifest = await institute_instance.institute_setup_runtime()
     return rendered_manifest

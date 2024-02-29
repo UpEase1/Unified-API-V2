@@ -1,140 +1,52 @@
-import numpy as np
-import random
-
+import pandas as pd
 import numpy as np
 
-class GradingRule:
-    def __init__(self, rule_dict):
-        self.grade = rule_dict['grade']
-        self.scale = rule_dict.get('scale', None)
-        self.abs_rule = rule_dict.get('abs_rule', None)
-        self.rel_rule = rule_dict.get('rel_rule', None)
-        self.type = rule_dict['type']
+def analyze_demand(data):
+    # Step 1: Organize Data
+    quarters = ["FY20 Q4", "FY21 Q1", "FY21 Q2", "FY21 Q3", "FY21 Q4", 
+                "FY22 Q1", "FY22 Q2", "FY22 Q3", "FY22 Q4", 
+                "FY23 Q1", "FY23 Q2", "FY23 Q3"]
+    df = pd.DataFrame(data, index=quarters, columns=["Demand"])
+    
+    # Step 2: Analyze Quarterly Demand
+    df['Fiscal Quarter'] = [q.split(" ")[1] for q in quarters]
+    average_demand_per_quarter = df.groupby('Fiscal Quarter').mean()
+    std_deviation_per_quarter = df.groupby('Fiscal Quarter').std()
+    
+    # Step 3: Identify Bias
+    # Bias identification would be more subjective based on std_deviation_per_quarter and external knowledge
+    
+    # Step 4: Yearly Trend Analysis
+    fy_demand = {
+        "FY20": df.loc["FY20 Q4", "Demand"],
+        "FY21": df.loc["FY21 Q1":"FY21 Q4", "Demand"].sum(),
+        "FY22": df.loc["FY22 Q1":"FY22 Q4", "Demand"].sum(),
+        "FY23": df.loc["FY23 Q1":"FY23 Q3", "Demand"].sum(),
+    }
+    fy_demand = pd.Series(fy_demand)
+    yoy_growth = fy_demand.pct_change()
+    
+    # Step 5: Predict FY23 Q4 Demand
+    adjusted_fy23_demand = fy_demand["FY23"] / (3/4)  # Assuming Q1-Q3 represents 75% of the year
+    predicted_fy23_q4_demand = adjusted_fy23_demand - fy_demand["FY23"]
+    
+    return {
+        "Average Demand Per Quarter": average_demand_per_quarter,
+        "Standard Deviation Per Quarter": std_deviation_per_quarter,
+        "FY Demand Totals": fy_demand,
+        "YoY Growth": yoy_growth,
+        "Predicted FY23 Q4 Demand": predicted_fy23_q4_demand,
+    }
+def analyze_demand_from_string(input_string):
+    # Convert space-separated string to list of integers
+    data = [int(value) for value in input_string.split()]
+    
+    # Perform the generalized analysis
+    return analyze_demand(data)
 
-    def evaluate_absolute(self, score):
-        if self.abs_rule is not None:
-            return eval(self.abs_rule, {'total_score': score})
-        return False
+# Sample input string, space-separated
+input_string = "28279	22704	24098	31461	47009	35145	45978	34518	40605	26925	23635	17795"
+result_from_string = analyze_demand_from_string(input_string)
 
-    def evaluate_relative(self, score, mean, std_dev):
-        if self.rel_rule is not None:
-            return eval(self.rel_rule, {'total_score': score, 'mean': mean, 'std_dev': std_dev})
-        return False
-
-
-class GradingSystem:
-    def __init__(self, rules):
-        self.rules = [GradingRule(rule) for rule in rules]
-
-    def get_grade_scale(self, grade):
-        for rule in self.rules:
-            if grade == rule.grade:
-                return rule.scale
-        return None
-
-    def get_grade_by_scale(self, scale):
-        for rule in self.rules:
-            if scale == rule.scale:
-                return rule.grade
-        return None
-
-    def calculate_absolute_grade(self, score):
-        for rule in self.rules:
-            if rule.evaluate_absolute(score):
-                return rule.grade
-        return None
-
-    def calculate_relative_grade(self, score, mean, std_dev):
-        for rule in self.rules:
-            if rule.evaluate_relative(score, mean, std_dev):
-                return rule.grade
-        return None
-
-    def calculate_grades(self, grade_type, scores):
-        mean = np.mean(scores)
-        std_dev = np.std(scores)
-
-        student_grades = []
-        for score in scores:
-            if grade_type == 'absolute':
-                grade = self.calculate_absolute_grade(score)
-            elif grade_type == 'relative':
-                absolute_grade = self.calculate_absolute_grade(score)
-                relative_grade = self.calculate_relative_grade(score, mean, std_dev)
-                absolute_scale = self.get_grade_scale(absolute_grade)
-                relative_scale = self.get_grade_scale(relative_grade)
-                grade = self.get_grade_by_scale(max(absolute_scale, relative_scale))
-            else:
-                grade = None
-
-            student_grades.append({'score':score, 'grade':grade})
-
-        return student_grades
-grade_type = 'relative'
-max_score = 100
-true_scores = [64.53, 42.69, 54.53, 65.12, 40.36, 39.06, 47.23, 38.91, 60.03, 54.13, 40.97, 35.73, 45.01, 51.92, 26.79, 51.19, 33.84, 50.70, 68.03, 37.00]
-rules = [
-            {
-                "grade": "A+",
-                "scale": 10,
-                "rel_rule": "100 >= total_score >= mean + 1.5*std_dev",
-                "abs_rule": "90 <= total_score <= 100",
-                "type": "calculated"
-            },
-            {
-                "grade": "A",
-                "scale": 9,
-                "rel_rule": "mean + 1.5*std_dev > total_score >= mean + 0.5*std_dev",
-                "abs_rule": "80 <= total_score < 90",
-                "type": "calculated"
-            },
-            {
-                "grade": "B",
-                "scale": 8,
-                "rel_rule": "mean + 0.5*std_dev > total_score >= mean - 0.5*std_dev",
-                "abs_rule": "70 <= total_score < 80",
-                "type": "calculated"
-            },
-            {
-                "grade": "C",
-                "scale": 7,
-                "rel_rule": "mean - 0.5*std_dev > total_score >= mean - 1.0*std_dev",
-                "abs_rule": "60 <= total_score < 70",
-                "type": "calculated"
-            },
-            {
-                "grade": "D",
-                "scale": 6,
-                "rel_rule": "mean - 1.0*std_dev > total_score >= mean - 1.5*std_dev",
-                "abs_rule": "50 <= total_score < 60",
-                "type": "calculated"
-                
-            },
-            {
-                "grade": "E",
-                "scale": 5,
-                "rel_rule": "mean - 1.5*std_dev > total_score >= mean - 2.0*std_dev",
-                "abs_rule": "40 <= total_score < 50",
-                "type": "calculated"
-            },
-            {
-                "grade": "F",
-                "scale": 0,
-                "rel_rule": "0 <= total_score < mean - 2.0*std_dev",
-                "abs_rule": "0 < total_score < 40",
-                "type": "calculated"
-            },
-            {
-                "grade": "I",
-                "scale": 0,
-                "type": "non_calculated"
-            },
-            {
-                "grade": "DT",
-                "scale": 0,
-                "type": "non_calculated"
-            }
-        ]
-grading_system = GradingSystem(rules)
-grades = grading_system.calculate_grades(grade_type,scores=[score*100/max_score for score in true_scores])
-print(grades)
+# Display the results
+print(result_from_string)

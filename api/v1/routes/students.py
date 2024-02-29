@@ -13,7 +13,6 @@ from ..graph_files.institute import Institute
 from configparser import ConfigParser
 from jose import JWTError, jwt
 from typing import List,Optional
-import logging
 
 router = APIRouter()
 config = ConfigParser()
@@ -24,9 +23,6 @@ courses_instance = Courses(azure_settings)
 CLIENT_ID = azure_settings['clientId']
 
 security = HTTPBearer()
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 # Auth
 def get_token_from_header(request: Request):
@@ -90,23 +86,23 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
         raise HTTPException(status_code=401, detail=f"JWT Error: {str(e)}")
 
 # To scope the endpoint add current_user:dict = Depends(get_current_user) to the endpoint funtion
-@router.get("/")
-async def get_all_students(current_user: dict = Depends(get_current_user)):
+@router.get("")
+async def get_all_students():
     students = await students_instance.get_all_students()
     return students
 
 @router.get("/{student_id}")
-async def get_student_by_id(student_id: str,current_user: dict = Depends(get_current_user)):
+async def get_student_by_id(student_id: str):
     student = await students_instance.get_student_by_id(id_num=student_id)
     return student
 
 @router.get("/{student_id}/courses")
-async def get_courses_of_student(student_id:str,current_user: dict = Depends(get_current_user)):
+async def get_courses_of_student(student_id:str):
     courses = await students_instance.get_courses_of_student(student_id=student_id)
     return courses
 
 @router.get("/{student_id}/attendance")
-async def get_attendance(student_id: str, request:Request, course_ids: str = Query(None, description="Enter comma seperated course ids"),current_user: dict = Depends(get_current_user)):
+async def get_attendance(student_id: str, request:Request, course_ids: str = Query(None, description="Enter comma seperated course ids")):
     course_ids = request.query_params.get("course_ids")
     if course_ids:
         course_ids = course_ids.split(",")  
@@ -115,17 +111,17 @@ async def get_attendance(student_id: str, request:Request, course_ids: str = Que
     return attendance_records
 
 @router.put("/update/{student_id}")
-async def update_student(student_id: str, property_name: str, property_value: str,current_user: dict = Depends(get_current_user)):
+async def update_student(student_id: str, property_name: str, property_value: str):
     await students_instance.update_student_v1(property_value=property_value,student_id=student_id,property_name=property_name)
     return JSONResponse({"updated": "ok"}, status.HTTP_200_OK)
 
-@router.post("/")
-async def create_student(student_properties:dict,current_user: dict = Depends(get_current_user)):
+@router.post("")
+async def create_student(student_properties:dict):
     password_properties = await students_instance.student_creation_singular(student_properties=student_properties)
     return password_properties
 
 @router.post("/bulk")
-async def create_student_bulk(student_properties_collection:list,current_user: dict = Depends(get_current_user)):
+async def create_student_bulk(student_properties_collection:list):
     password_properties_collection = []
     for student_properties in student_properties_collection:
         password_properties = await students_instance.student_creation_singular(student_properties = student_properties)
@@ -133,10 +129,10 @@ async def create_student_bulk(student_properties_collection:list,current_user: d
     return password_properties_collection
 
 @router.delete("/remove/{student_id}")
-async def deregister_student(student_id:str,current_user: dict = Depends(get_current_user)):
+async def deregister_student(student_id:str):
     await students_instance.deregister_student(student_id = student_id)
 
-@router.delete("/")
-async def deregister_students_bulk(student_ids:list,current_user: dict = Depends(get_current_user)):
+@router.delete("")
+async def deregister_students_bulk(student_ids:list):
     for student_id in student_ids:
         await students_instance.deregister_student(student_id = student_id)

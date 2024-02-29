@@ -6,7 +6,6 @@ from ..graph_files.students import Students
 from ..graph_files.courses import Courses
 from ..graph_files.institute import Institute
 from ..graph_files.grade_routine import GradeRoutine
-from ..graph_files.openai import OpenAI
 from ..graph_files.announcement_routine import AnnouncementRoutine
 
 from ..models.announcements import *
@@ -25,7 +24,6 @@ config.read(['config.cfg', 'config.dev.cfg'])
 azure_settings = config['azure']
 grade_routines_instance = GradeRoutine(azure_settings)
 announcement_routines_instance = AnnouncementRoutine(azure_settings)
-openai_api_instance = OpenAI(azure_settings)
 CLIENT_ID = azure_settings['clientId']
 security = HTTPBearer()
 

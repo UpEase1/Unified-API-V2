@@ -25,8 +25,8 @@ class Students:
         self.settings = config
         self.app_client = GraphServiceClientSingleton.get_instance()
 
-    async def get_all_students(self):
-        app_id_fetched = self.settings["stu_dir_app"]
+    async def get_all_students(self) -> list:
+        app_id_fetched = self.settings["stu_dir_app"] 
         app_id = re.sub(r'-','',app_id_fetched)
         query_params = UsersRequestBuilder.UsersRequestBuilderGetQueryParameters(
             select=['displayName', 'id', 'faxNumber','mail','jobTitle', 'extension_0a09fe4eefd047798b49f80aaaecb550_student_program'],

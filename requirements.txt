@@ -54,7 +54,7 @@ click==8.1.5
 colorama==0.4.6
 contourpy==1.1.0
 cycler==0.11.0
-fastapi==0.99.1
+fastapi==0.110.0
 fastapi-sessions==0.3.2
 fonttools==4.41.0
 future==0.18.3
@@ -82,4 +82,6 @@ websockets==11.0.3
 jwcrypto
 openai
 python-jose
-
+semantic-kernel
+fuzzywuzzy
+python-Levenshtein
