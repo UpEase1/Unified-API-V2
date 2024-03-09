@@ -135,10 +135,12 @@ class StudentSkills:
                     md_table += f"{student_name} | {course_name} | {attendance_record_str} | {attendance_percentage}%\n"
 
             return md_table
-
-        return generate_md_table(data = attendance_record)
+        insights = await openai_instance.get_attendance_commentary(attendance_record)
+        table = generate_md_table(data = attendance_record)
+        return insights + "\n\n" + table
 
 class CourseSkills:
+    
     
     def __init__(self):
         self.openai_client = AsyncAzureOpenAIClientSingleton.get_azure_openai_client()
@@ -237,8 +239,8 @@ class CourseSkills:
         # return str(attendance_record)
         def generate_md_table(data):
             # Define the Markdown table header
-            md_table = "Student Name | Course Name | Attendance Record | Attendance Percentage\n"
-            md_table += "--- | --- | --- | ---\n"  # Table formatting for Markdown
+            md_table = "Course Name | Student Name | Attendance Percentage\n"
+            md_table += "--- | --- | ---\n"  # Table formatting for Markdown
 
             # Iterate through each course's data
             for course in data:
@@ -254,13 +256,17 @@ class CourseSkills:
                     attendance_percentage = (present_classes / total_classes) * 100
 
                     # Format the attendance record as a string
-                    attendance_record_str = ", ".join([f"{list(record.keys())[0]}: {'Present' if list(record.values())[0] == 'P' else 'Absent'}" for record in attendance_records])
+                    # attendance_record_str = ", ".join([f"{list(record.keys())[0]}: {'Present' if list(record.values())[0] == 'P' else 'Absent'}" for record in attendance_records])
                     
                     # Append a new row to the Markdown table for each student in the course
-                    md_table += f"{student_name} | {course_name} | {attendance_record_str} | {attendance_percentage:.2f}%\n"
+                    md_table += f"{course_name} | {student_name} | {attendance_percentage:.2f}%\n"
 
             return md_table
-        return generate_md_table(attendance_record)
+        insights = await openai_instance.get_attendance_commentary(attendance_record)
+        table = generate_md_table(attendance_record)
+        print(insights)
+        # return generate_md_table(data = attendance_record) + "\n  + \n" + insights
+        return insights + "\n\n" + table
 
 # Assuming 'data' contains your attendance record schema as given
 # print(generate_md_table(data))
