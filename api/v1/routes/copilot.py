@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Request, Query, status, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
-from ..graph_files.openai import OpenAI
+from ..graph_files.copilot import UpeaseCopilot
 
 from configparser import ConfigParser
 from jose import JWTError, jwt
@@ -16,7 +15,7 @@ router = APIRouter()
 config = ConfigParser()
 config.read(['config.cfg', 'config.dev.cfg'])
 azure_settings = config['azure']
-openai_api_instance = OpenAI(azure_settings)
+semantic_kernel_instance = UpeaseCopilot(azure_settings)
 CLIENT_ID = azure_settings['clientId']
 security = HTTPBearer()
 
@@ -84,5 +83,6 @@ def get_current_user(authorization: HTTPAuthorizationCredentials = Depends(secur
         raise HTTPException(status_code=401, detail=f"JWT Error: {str(e)}")
 
 @router.get("/insights")
-async def get_insights(query:str, current_user: dict = Depends(get_current_user)):
-    return await openai_api_instance.make_openai_call(query)
+async def upease_copilot(query:str):
+    result = await semantic_kernel_instance.upease_copilot(ask=query)
+    return result

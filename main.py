@@ -4,7 +4,7 @@ import pandas as pd
 from msgraph.generated.models.o_data_errors.o_data_error import ODataError
 from typing import List, Optional
 from jose import JWTError, jwt
-import logging
+import logging 
 
 from fastapi import FastAPI, Body, Depends, HTTPException, Request, Query, Security
 from fastapi.responses import JSONResponse
@@ -21,12 +21,15 @@ app = FastAPI()
 security = HTTPBearer()
 
 # CORS
-origins = [
-    "http://localhost:8100",
-    "https://student.upease.biz",
-    "https://console.upease.biz",
-    "http://localhost:3000"
-]
+# origins = [
+#     "http://localhost:8100",
+#     "https://student.upease.biz",
+#     "https://console.upease.biz",
+#     "http://localhost:3000",
+#     "https://upease-console.vercel.app",
+# ]
+
+origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

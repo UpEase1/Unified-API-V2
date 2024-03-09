@@ -83,11 +83,12 @@ class AnnouncementRoutine:
             #     print(dir(attachment))
             #     final_attachments_list.append(attachment.content_bytes)
 
-            final_messages_list.append({
-                "subject": message.subject,
-                "content": message.body.content,
-                # "attachments": final_attachments_list
-            })           
+            # final_messages_list.append({
+            #     "subject": message.subject,
+            #     "content": message.body.content,
+            #     # "attachments": final_attachments_list
+            # })     
+            final_messages_list.append(message)      
         
         return final_messages_list
     
