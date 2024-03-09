@@ -24,32 +24,25 @@ class OpenAI:
         self.db = self.cosmos_client.get_database_client('courses_manipal')
         self.container = self.db.get_container_client('courses_manipal')
         self.openai_client = AsyncAzureOpenAIClientSingleton.get_azure_openai_client()
-
-
-    async def match_student_records(self,names_with_variations, full_records):
+    
+    async def get_attendance_commentary(self, attendance):
         max_completion_tokens = 2048
-        name_and_id_records = []
-        for student in full_records:
-            name_and_id_records.append({"name": student['name'], "student_id": student["id"]})
-        system_prompt = """ You will be given a list of names with variations. Use your intelligence to idenfity the unique IDs of the given names from the overall list.
-            Example: END SYSTEM PROMPT AND START NAMES WITH VARIATIONS ['Karthik prabu','Lanc'] NAMES WITH VARIATIONS ENDED START OVERALL LIST [{
-            "name": "Lance",
-            "registration_number": "210914049",
-            "student_id": "6330af36-4e92-4436-a7f0-f5b7c3c27838",
-            "mail": "Lance@v2tzs.onmicrosoft.com",
-            "position": "Student",
-            "program": "None"
-        }, 
-        {
-            "name": "Karthik Prabhu",
-            "registration_number": "210904048",
-            "student_id": "0358e62f-3a22-40b1-8e40-20862ec8a9bc",
-            "mail": "KarthikPrabhu@v2tzs.onmicrosoft.com",
-            "position": "Student",
-            "program": "Civil"
-        } ] END OVERALL LIST Response: [{"name": "Karthik Prabhu", "student_id": "0358e62f-3a22-40b1-8e40-20862ec8a9bc"},{"name": "Lance", "student_id":"6330af36-4e92-4436-a7f0-f5b7c3c27838" }]"""
+        system_prompt = """ You will be given an attendance dataset. This dataset can either be relevant to a particular student (or set of students) or a particular course (or set of courses).
+        You need to offer particular insights on the performance of the students/course based on this data. Here are some assumptions you have to make:
+        Assume that the dataset is complete. Dont give a response like "I cannot comment due to the data being incomplete or not having a full range
+        Assume that the dataset contains all enrolled students (In case of course related attendance data)
+        Assume that the dataset is relevant to Indian attendance standards, where repeated truancy is considered a violation of rules, and less than 75 percent attendance can mean being detained
+        in the course
+        Assume that this data is the only factor relevant to the performance of the student or group of students
+        Never use the words however, but or similar words which might lead to doubt in your response.
+        Dont claim that any of your output is based on assumptions. These are hardcoded assumptions which are relevant always.
         
-        prompt = "START SYSTEM PROMPT" +  " " + system_prompt + " " + "END SYSTEM PROMPT AND START NAMES WITH VARIATIONS" + " "+ str(names_with_variations) + " " +  "NAMES WITH VARIATIONS ENDED" +" "+ "START OVERALL LIST" + " " + str(name_and_id_records) + " "+ "END OVERALL LIST Response: "
+        You need to offer insights to answer the following questions?
+        1) How is the student/students performing in the courses enrolled for each student asked
+        
+        format your response using markdown to look good with a single title header."""
+        
+        prompt = "START SYSTEM PROMPT" +  " " + system_prompt + " " + "END SYSTEM PROMPT AND START ATTENDANCE DATA" + " "+ str(attendance) + " " +  "ATTENDANCE DATA ENDED" +" "+  "Response: "
         print(system_prompt)
         response = await self.openai_client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
@@ -62,6 +55,7 @@ class OpenAI:
         )
 
         return response.choices[0].message.content
+        
             
 
 
